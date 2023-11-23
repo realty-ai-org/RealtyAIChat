@@ -3,14 +3,21 @@ import styles from '../../../assets/index.css'
 import { BubbleButton } from './BubbleButton'
 import { BubbleParams } from '../types'
 import { Bot, BotProps } from '../../../components/Bot'
+import { getCookie } from '@/utils/index'
 
 export type BubbleProps = BotProps & BubbleParams
 
 export const Bubble = (props: BubbleProps) => {
     const [bubbleProps] = splitProps(props, ['theme'])
+    
+    //check cookie for how many times the site as been loaded
+    const numLoadedCookie: string =  getCookie("numLoadedChat");
+    let numLoaded: number  = parseInt(numLoadedCookie);
+    numLoaded = numLoaded ? numLoaded : 0;  
+    const isOpen: boolean = numLoaded < 4 ? true : false;
 
-    const [isBotOpened, setIsBotOpened] = createSignal(true)
-    const [isBotStarted, setIsBotStarted] = createSignal(true)
+    const [isBotOpened, setIsBotOpened] = createSignal(isOpen)
+    const [isBotStarted, setIsBotStarted] = createSignal(isOpen)
     const [isVisible,setIsVisible] = createSignal(true)
     const [visibleCount,setVisibleCount] = createSignal(0)
     const openBot = () => {
@@ -41,7 +48,7 @@ export const Bubble = (props: BubbleProps) => {
     // if count is creater than two ie switched tabs twice then close bot window
     createEffect(() =>{ 
         if(visibleCount() > 2 ){
-            console.log("closed window because of toggling tab");
+            // console.log("closed window because of toggling tab");
             closeBot();
         }
     })

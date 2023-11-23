@@ -1,5 +1,5 @@
 /* eslint-disable solid/reactivity */
-import { sendRequest } from '@/utils/index'
+import { sendRequest, getCookie, setCookie} from '@/utils/index'
 type BotProps = {
     chatflowid: string
     apiHost?: string
@@ -17,7 +17,12 @@ export const initFull = (props: BotProps & { id?: string }) => {
     Object.assign(fullElement, props)
 }
 
-export const  init = async (props: BotProps) => {
+
+export const init = async (props: BotProps) => {
+    const numLoadedCookie: string =  getCookie("numLoadedChat");
+    let numLoaded: number  = parseInt(numLoadedCookie);
+    numLoaded = numLoaded ? numLoaded : 0; 
+    setCookie("numLoadedChat",numLoaded + 1,1)
     const data = sendRequest<any>({
         method: 'GET',
         url: `https://vshdvtqafk.execute-api.us-east-2.amazonaws.com/default/user_config_api/?username=`+props.userID,
@@ -29,7 +34,6 @@ export const  init = async (props: BotProps) => {
     props.theme = config_data?.theme;
     props.chatflowid = config_data?.chatflowid;
     props.apiHost = config_data?.apiHost;
-    console.log(props)
     const element = document.createElement('flowise-chatbot')
     Object.assign(element, props)
     document.body.appendChild(element)
