@@ -7,6 +7,8 @@ export type MessageType = {
 };
 export type BotProps = {
     chatflowid: string;
+    includeQuestions?: boolean;
+    closeBoxFunction?: () => void;
     apiHost?: string;
     chatflowConfig?: Record<string, unknown>;
     welcomeMessage?: string;

@@ -1,4 +1,4 @@
-import { createSignal, createEffect, For, onMount } from 'solid-js'
+import { createSignal, createEffect, For, onMount, Show } from 'solid-js'
 import { sendMessageQuery, isStreamAvailableQuery, IncomingInput } from '@/queries/sendMessageQuery'
 import { TextInput } from './inputs/textInput'
 import { GuestBubble } from './bubbles/GuestBubble'
@@ -9,7 +9,7 @@ import { BotMessageTheme, TextInputTheme, UserMessageTheme } from '@/features/bu
 import { Badge } from './Badge'
 import socketIOClient from 'socket.io-client'
 import { Popup } from '@/features/popup'
-
+import { QuestionButton } from './bubbles/QuestionButton'
 type messageType = 'apiMessage' | 'userMessage' | 'usermessagewaiting'
 
 export type MessageType = {
@@ -20,6 +20,8 @@ export type MessageType = {
 
 export type BotProps = {
     chatflowid: string
+    includeQuestions?: boolean
+    closeBoxFunction?: ()=>void
     apiHost?: string
     chatflowConfig?: Record<string, unknown>
     welcomeMessage?: string
@@ -119,6 +121,7 @@ export const Bot = (props: BotProps & { class?: string }) => {
     const [loading, setLoading] = createSignal(false)
     const [sourcePopupOpen, setSourcePopupOpen] = createSignal(false)
     const [sourcePopupSrc, setSourcePopupSrc] = createSignal({})
+    const [questionClicked,setQuestionClicked] = createSignal(false)
     const [messages, setMessages] = createSignal<MessageType[]>([
         {
             message: props.welcomeMessage ?? defaultWelcomeMessage,
@@ -324,11 +327,21 @@ export const Bot = (props: BotProps & { class?: string }) => {
         })
         return newSourceDocuments
     }
+
+    const clickPrompt = (message: string) =>{
+        // console.log("clicked the button")
+        // console.log(message)
+        handleSubmit(message)
+        setQuestionClicked(true)
+
+    }
+
     return (
         <>
             <div ref={botContainer} class={'relative flex w-full h-full text-base overflow-hidden bg-cover bg-center flex-col items-center chatbot-container ' + props.class}>
                 <div class="flex w-full h-full justify-center">
-                    <div style={{ "padding-bottom": '100px' }} ref={chatContainer} class="overflow-y-scroll min-w-full w-full min-h-full px-3 pt-10 relative scrollable-container chatbot-chat-view scroll-smooth">
+                    <div style={{ "padding-bottom": props.includeQuestions && (!questionClicked()) ? "170px" : "110px" }} ref={chatContainer} class="overflow-y-scroll min-w-full w-full min-h-full px-3 pt-10 relative scrollable-container chatbot-chat-view scroll-smooth">
+                    
                         <For each={[...messages()]}>
                             {(message, index) => (
                                 <>
@@ -379,7 +392,39 @@ export const Bot = (props: BotProps & { class?: string }) => {
                                 </>
                             )}
                         </For>
+                      
                     </div>
+                    <button class="close-tab-btn" onclick={props.closeBoxFunction}>&times;</button>
+                    <Show when={props.includeQuestions && !questionClicked()}>
+                        <div class="question-container flex"
+                        
+                            style={{
+                                position: 'absolute',
+                                left: '20px',
+                                width: 'calc(100% - 40px)',
+                                bottom: '100px',
+                                // height: '20px',
+                                margin: 'auto',
+                            "z-index": 1000,
+                        }}
+                        >
+                            <QuestionButton
+                                question={"Can I book a meeting?"}
+                                onQuestionClick={clickPrompt}
+                                leftOffset = {"0%"}
+                            />
+                            <QuestionButton
+                                question={"What can I buy for $1 Million?"}
+                                onQuestionClick={clickPrompt}
+                                leftOffset = {"30%"}
+                            />
+                            <QuestionButton
+                                question={"Where is best to buy?"}
+                                onQuestionClick={clickPrompt}
+                                leftOffset = {"60%"}
+                            />
+                        </div>
+                    </Show>
                     <TextInput
                         backgroundColor={props.textInput?.backgroundColor}
                         textColor={props.textInput?.textColor}
@@ -389,9 +434,13 @@ export const Bot = (props: BotProps & { class?: string }) => {
                         defaultValue={userInput()}
                         onSubmit={handleSubmit}
                     />
+                    
                 </div>
+                
+               
                 <Badge badgeBackgroundColor={props.badgeBackgroundColor} poweredByTextColor={props.poweredByTextColor} botContainer={botContainer} />
                 <BottomSpacer ref={bottomSpacer} />
+                
             </div>
             {sourcePopupOpen() && <Popup isOpen={sourcePopupOpen()} value={sourcePopupSrc()} onClose={() => setSourcePopupOpen(false)} />}
         </>

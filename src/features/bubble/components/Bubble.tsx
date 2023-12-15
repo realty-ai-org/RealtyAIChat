@@ -9,7 +9,6 @@ export type BubbleProps = BotProps & BubbleParams
 
 export const Bubble = (props: BubbleProps) => {
     const [bubbleProps] = splitProps(props, ['theme'])
-    
     //check cookie for how many times the site as been loaded
     const numLoadedCookie: string =  getCookie("numLoadedChat");
     let numLoaded: number  = parseInt(numLoadedCookie);
@@ -52,8 +51,8 @@ export const Bubble = (props: BubbleProps) => {
             closeBot();
         }
     })
-   
 
+    
     return (
         <>
             <style>{styles}</style>
@@ -86,7 +85,11 @@ export const Bubble = (props: BubbleProps) => {
                         fontSize={bubbleProps.theme?.chatWindow?.fontSize}
                         chatflowid={props.chatflowid}
                         chatflowConfig={props.chatflowConfig}
-                        apiHost={props.apiHost} />
+                        apiHost={props.apiHost} 
+                        closeBoxFunction={closeBot}
+                        includeQuestions={props.includeQuestions}
+                        />
+
                 </Show>
             </div>
         </>
