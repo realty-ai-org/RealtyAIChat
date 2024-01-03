@@ -7,10 +7,11 @@ const chatbot = parseChatbot()
 
 injectChatbotInWindow(chatbot)
 
-const user_id = document?.currentScript?.getAttribute('userid')!;
-console.log(user_id)
+// const script_id = document.getElementById("realty_ai")?.getAttribute("data-realityaiid");
+const script_id = document.getElementById("realty_ai")?.dataset.realityaiid;
+console.log("script_id:"+script_id)
 chatbot.init({
-    userID: user_id,
+    userID: script_id?script_id:"",
     chatflowid: '',
     includeQuestions: false
 })
