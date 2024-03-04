@@ -3,12 +3,13 @@ import { sendRequest, getCookie, setCookie} from '@/utils/index'
 type BotProps = {
     chatflowid: string
     includeQuestions: boolean
+    loadID?: string,
+    userID?: string,
     defaultOpenDesktop?:boolean,
     defaultOpenMobile?:boolean,
     delayOpenFlag?: boolean, 
     delayOpenSeconds?:number,
     apiHost?: string
-    userID?:string
     chatflowConfig?: Record<string, unknown>
     theme?:Record<string, unknown>
 }
@@ -28,7 +29,7 @@ export const initFull = (props: BotProps & { id?: string }) => {
         props.defaultOpenMobile = config_data?.defaultOpenMobile
         props.delayOpenSeconds = config_data?.delayOpenSeconds
         props.delayOpenFlag = config_data?.delayOpenFlag
-
+        props.loadID = config_data?.load_id ? config_data?.load_id :""
         const fullElement = props.id
         ? document.getElementById(props.id)
         : document.querySelector('flowise-fullchatbot-parent')
@@ -62,7 +63,7 @@ export const init = async (props: BotProps) => {
         props.defaultOpenMobile = config_data?.defaultOpenMobile
         props.delayOpenSeconds = config_data?.delayOpenSeconds
         props.delayOpenFlag = config_data?.delayOpenFlag
-
+        props.loadID = config_data?.load_id ? config_data?.load_id :""
 
         // props.isOpen = props.isOpen || default_open
         const element = document.createElement('flowise-chatbot')
