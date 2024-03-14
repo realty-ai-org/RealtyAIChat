@@ -15,7 +15,6 @@ export const Bubble = (props: BubbleProps) => {
     // numLoaded = numLoaded ? numLoaded : 0; 
     
     
-
     //const isMobile =  window?.innerWidth ? (window?.innerWidth < 1000): false;
     const isMobile = isMobileCheck()
     console.log("is mobile",isMobile)
@@ -28,7 +27,7 @@ export const Bubble = (props: BubbleProps) => {
     
     const bot_closed_before = getCookie(cookie_name)
     console.log("bot previously closed",bot_closed_before)
-    if (bot_closed_before ==="true"){
+    if ((bot_closed_before ==="true") && props.stayClosedFlag){
         defaultOpen = false
     }
 
@@ -45,9 +44,17 @@ export const Bubble = (props: BubbleProps) => {
     }
 
     const timedOpenBot = () => {
-        console.log("Timed Open")
-        if ((!isBotOpened()) && (!hasClosed())&&!(bot_closed_before ==="true")){
+        console.log("Delayed Bot Popup")
+
+        if (props.stayClosedFlag && (bot_closed_before === "true")){
+            console.log("No Popup - previously closed")
+            return
+        }
+        console.log(props.delayOpenFlag)
+        if (props.delayOpenFlag && (!isBotOpened()) && (!hasClosed())){
             openBot()
+        }else{
+            console.log("No Popup - open and closed already")
         }
     }
 
