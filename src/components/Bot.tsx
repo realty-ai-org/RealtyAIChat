@@ -139,7 +139,22 @@ export const Bot = (props: BotProps & { class?: string }) => {
     const [socketIOClientId, setSocketIOClientId] = createSignal('')
     const [isChatFlowAvailableToStream, setIsChatFlowAvailableToStream] = createSignal(false)
 
+    const token_buffer:Array<string> = [] 
     
+
+    const process_message = ()=>{
+        const text = token_buffer.shift()
+        if (text) {
+            updateLastMessage(text)
+        }
+    }
+    
+    const push_message_to_buffer = (text: string) => {
+        token_buffer.push(text)
+    }
+
+    setInterval(process_message,75)
+
     const convo_message: ConvoType = {
         messages:[
             {
@@ -170,6 +185,8 @@ export const Bot = (props: BotProps & { class?: string }) => {
     }
 
     const updateLastMessage = (text: string) => {
+
+        console.log(token_buffer)
         setMessages(data => {
             const updated = data.map((item, i) => {
                 if (i === data.length - 1 && item.type === "apiMessage" && item.streamable) {
@@ -211,6 +228,63 @@ export const Bot = (props: BotProps & { class?: string }) => {
         setUserInput('')
         scrollToBottom()
     }
+    
+    const unique_socket_handle_submit = async (value: string) => {
+        
+        const socket = socketIOClient(props.apiHost as string)
+
+        socket.on('connect', () => {
+            console.log("connected")
+            setSocketIOClientId(socket.id)
+
+        })
+
+        socket.on('start', (value:string) => {
+            console.log("start stream")
+            console.log(value)
+            // setMessages((prevMessages) => [...prevMessages, { message: '', type: 'apiMessage' }])
+        })
+
+        socket.on('sourceDocuments', updateLastMessageSourceDocuments)
+
+        socket.on('token', push_message_to_buffer)
+        return socket
+
+        
+    }
+
+    
+    const create_socket_promise = (name: string) => {
+        const socket = socketIOClient(props.apiHost as string)
+
+
+        socket.on('start', (value:string) => {
+            console.log("start stream")
+            console.log(value)
+            // setMessages((prevMessages) => [...prevMessages, { message: '', type: 'apiMessage' }])
+        })
+
+        socket.on('sourceDocuments', updateLastMessageSourceDocuments)
+
+        socket.on('token', (value) =>{
+            console.log("appended from "+name+ " "+ socket.id) 
+            push_message_to_buffer(value)})
+        
+        const timeout = 1000
+        return new Promise((resolve,reject) => {
+            const timer = setTimeout(() => {
+                reject("");
+                socket.disconnect()
+            }, timeout);
+            socket.on('connect', () => {
+                console.log("connected")
+                console.log(name)
+                resolve(socket)
+                clearTimeout(timer);
+            })
+        })
+
+    }
 
     // Handle form submission
     const handleSubmit = async (value: string) => {
@@ -235,7 +309,16 @@ export const Bot = (props: BotProps & { class?: string }) => {
         }
         if (props.chatflowConfig) body.overrideConfig = props.chatflowConfig
 
-        if (isChatFlowAvailableToStream()) body.socketIOClientId = socketIOClientId()
+
+        const message_socket: any = await create_socket_promise("message socket")
+        console.log("message socket id",message_socket.id)
+        if(isChatFlowAvailableToStream()){
+            body.socketIOClientId = message_socket?.id
+        } else {
+
+        }
+
+
         let bot_resp_time = new Date().toISOString()
         const result = await sendMessageQuery({
             chatflowid: props.chatflowid,
@@ -275,13 +358,15 @@ export const Bot = (props: BotProps & { class?: string }) => {
                 }
             } else {
                 //console.log(message_id,result.data)
-                updateFullMessage(result.data,message_id)
+                // updateFullMessage(result.data,message_id)
                 //if (!isChatFlowAvailableToStream()) setMessages((prevMessages) => [...prevMessages, { message: data, type: 'apiMessage' }])
             }
             setLoading(false)
             setUserInput('')
             scrollToBottom()
         }
+        message_socket.disconnect()
+        console.log("disconnected socket")
         if (result.error) {
             const error = result.error
             console.error(error)
@@ -290,6 +375,7 @@ export const Bot = (props: BotProps & { class?: string }) => {
             handleError(errorData)
             return
         }
+
     }
 
     // Auto scroll chat to bottom
@@ -300,6 +386,28 @@ export const Bot = (props: BotProps & { class?: string }) => {
     createEffect(() => {
         if (props.fontSize && botContainer) botContainer.style.fontSize = `${props.fontSize}px`
     })
+
+    const create_socket = (name: string) => {
+        const socket = socketIOClient(props.apiHost as string)
+
+        socket.on('connect', () => {
+            console.log("connected")
+            console.log(name)
+            setSocketIOClientId(socket.id)
+        })
+
+        socket.on('start', (value:string) => {
+            console.log("start stream")
+            console.log(value)
+            // setMessages((prevMessages) => [...prevMessages, { message: '', type: 'apiMessage' }])
+        })
+
+        socket.on('sourceDocuments', updateLastMessageSourceDocuments)
+
+        socket.on('token', push_message_to_buffer)
+        return socket
+
+    }
 
     // eslint-disable-next-line solid/reactivity
     createEffect(async () => {
@@ -312,19 +420,7 @@ export const Bot = (props: BotProps & { class?: string }) => {
             setIsChatFlowAvailableToStream(data?.isStreaming ?? false)
         }
 
-        const socket = socketIOClient(props.apiHost as string)
-
-        socket.on('connect', () => {
-            setSocketIOClientId(socket.id)
-        })
-
-        socket.on('start', () => {
-            // setMessages((prevMessages) => [...prevMessages, { message: '', type: 'apiMessage' }])
-        })
-
-        socket.on('sourceDocuments', updateLastMessageSourceDocuments)
-
-        socket.on('token', updateLastMessage)
+        // const socket = create_socket("socket 1")
 
         // eslint-disable-next-line solid/reactivity
         return () => {
@@ -336,10 +432,10 @@ export const Bot = (props: BotProps & { class?: string }) => {
                     type: 'apiMessage'
                 }
             ])
-            if (socket) {
-                socket.disconnect()
-                setSocketIOClientId('')
-            }
+            // if (socket) {
+            //     socket.disconnect()
+            //     setSocketIOClientId('')
+            // }
         }
     })
 
