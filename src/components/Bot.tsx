@@ -214,6 +214,7 @@ export const Bot = (props: BotProps & { class?: string }) => {
 
     // Handle form submission
     const handleSubmit = async (value: string) => {
+        setQuestionClicked(true)
         setUserInput(value)
 
         if (value.trim() === '') {
@@ -462,7 +463,7 @@ export const Bot = (props: BotProps & { class?: string }) => {
                         <button class="close-tab-btn" onclick={props.closeBoxFunction}>&times;</button>
                     </Show>
                     <Show when={props.includeQuestions && !questionClicked()}>
-                        <div class="question-container flex"
+                        <div class="question-container flex outer-questions"
                         
                             style={{
                                 position: 'absolute',
