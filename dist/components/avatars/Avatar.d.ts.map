@@ -1,1 +1,1 @@
-{"version":3,"file":"Avatar.d.ts","sourceRoot":"","sources":["../../../src/components/avatars/Avatar.tsx"],"names":[],"mappings":"AAKA,eAAO,MAAM,MAAM,UAAW;IAAE,gBAAgB,CAAC,EAAE,MAAM,CAAA;CAAE,mCA2B1D,CAAA"}
+{"version":3,"file":"Avatar.d.ts","sourceRoot":"","sources":["../../../src/components/avatars/Avatar.tsx"],"names":[],"mappings":"AAIA,OAAO,EAAE,GAAG,EAAE,MAAM,UAAU,CAAC;AAE/B,eAAO,MAAM,MAAM,UAAW;IAC5B,gBAAgB,CAAC,EAAE,MAAM,CAAC;IAC1B,MAAM,CAAC,EAAE,OAAO,CAAC;IACjB,QAAQ,CAAC,EAAE,QAAQ,GAAG,KAAK,CAAC;IAC5B,KAAK,CAAC,EAAE,IAAI,aAAa,GAAG,SAAS,CAAC;CACvC,gBAwDA,CAAC"}

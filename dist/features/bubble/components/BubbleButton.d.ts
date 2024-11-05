@@ -1,6 +1,7 @@
-import { ButtonTheme } from '../types';
+import { ButtonTheme } from "../types";
 type Props = ButtonTheme & {
     isBotOpened: boolean;
+    avatarSrc?: string;
     toggleBot: () => void;
 };
 export declare const BubbleButton: (props: Props) => import("solid-js").JSX.Element;

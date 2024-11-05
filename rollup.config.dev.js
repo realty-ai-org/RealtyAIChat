@@ -8,6 +8,8 @@ import typescript from "@rollup/plugin-typescript";
 import { typescriptPaths } from "rollup-plugin-typescript-paths";
 import commonjs from "@rollup/plugin-commonjs";
 import { uglify } from "rollup-plugin-uglify";
+// import serve from "rollup-plugin-serve";
+import livereload from "rollup-plugin-livereload";
 
 const extensions = [".ts", ".tsx"];
 
@@ -33,6 +35,14 @@ const indexConfig = {
     typescript(),
     typescriptPaths({ preserveExtensions: true }),
     terser({ output: { comments: false } }),
+    // serve({
+    //   open: true,
+    //   verbose: true,
+    //   contentBase: ["dist"],
+    //   host: "localhost",
+    //   port: 5678,
+    // }),
+    livereload({ watch: "dist", delay: 1000 }),
   ],
 };
 

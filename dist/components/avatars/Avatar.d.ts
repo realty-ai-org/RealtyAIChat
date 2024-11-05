@@ -1,4 +1,8 @@
+import { JSX } from "solid-js";
 export declare const Avatar: (props: {
     initialAvatarSrc?: string;
-}) => import("solid-js").JSX.Element;
+    isLive?: boolean;
+    liveIcon?: "border" | "dot";
+    style?: JSX.CSSProperties | undefined;
+}) => JSX.Element;
 //# sourceMappingURL=Avatar.d.ts.map
