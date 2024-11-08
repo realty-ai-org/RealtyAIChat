@@ -34,7 +34,7 @@ export const Avatar = (props: {
           style="position: absolute;top: 84%;left: 84%;transform: translate(-50%, -50%);height: 33%;width: 33%;"
         >
           <path
-            fill="#0df300"
+            fill="#4fff45"
             d="m2 12a10 10 0 1 1 10 10 10 10 0 0 1 -10-10z"
           />
           <path
