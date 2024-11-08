@@ -2,6 +2,7 @@ import { Show, onMount } from "solid-js";
 import { Avatar } from "../avatars/Avatar";
 import { Marked } from "@ts-stack/markdown";
 import { LoadingBubble } from "./LoadingBubble";
+import Config from "@/config";
 
 type Props = {
   message: string;
@@ -11,9 +12,6 @@ type Props = {
   textColor?: string;
   loading?: boolean;
 };
-
-const defaultBackgroundColor = "#f3f3f3";
-const defaultTextColor = "#303235";
 
 Marked.setOptions({ isNoP: true });
 
@@ -53,8 +51,13 @@ export const BotBubble = (props: Props) => {
         when={!props.loading}
         fallback={
           <LoadingBubble
-            backgroundColor={props.backgroundColor ?? defaultBackgroundColor}
-            textColor={props.textColor ?? defaultTextColor}
+            backgroundColor={
+              props.backgroundColor ??
+              Config.theme.messages.bot.defaultBackgroundColor
+            }
+            textColor={
+              props.textColor ?? Config.theme.messages.bot.defaultTextColor
+            }
           />
         }
       >
@@ -63,8 +66,11 @@ export const BotBubble = (props: Props) => {
           class="px-4 py-2 ml-2 whitespace-pre-wrap max-w-full chatbot-host-bubble"
           data-testid="host-bubble"
           style={{
-            "background-color": props.backgroundColor ?? defaultBackgroundColor,
-            color: props.textColor ?? defaultTextColor,
+            "background-color":
+              props.backgroundColor ??
+              Config.theme.messages.bot.defaultBackgroundColor,
+            color:
+              props.textColor ?? Config.theme.messages.bot.defaultTextColor,
           }}
         />
       </Show>

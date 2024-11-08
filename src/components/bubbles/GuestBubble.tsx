@@ -1,6 +1,7 @@
 import { Show, onMount } from "solid-js";
 import { Avatar } from "../avatars/Avatar";
 import { Marked } from "@ts-stack/markdown";
+import Config from "@/config";
 
 type Props = {
   message: string;
@@ -9,9 +10,6 @@ type Props = {
   backgroundColor?: string;
   textColor?: string;
 };
-
-const defaultBackgroundColor = "#3B81F6";
-const defaultTextColor = "#ffffff";
 
 Marked.setOptions({ isNoP: true });
 
@@ -34,8 +32,10 @@ export const GuestBubble = (props: Props) => {
         class="px-4 py-2 mr-2 whitespace-pre-wrap max-w-full chatbot-guest-bubble"
         data-testid="guest-bubble"
         style={{
-          "background-color": props.backgroundColor ?? defaultBackgroundColor,
-          color: props.textColor ?? defaultTextColor,
+          "background-color":
+            props.backgroundColor ??
+            Config.theme.messages.user.defaultBackgroundColor,
+          color: props.textColor ?? Config.theme.messages.user.defaultTextColor,
           "border-radius": "6px",
         }}
       />

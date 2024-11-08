@@ -146,6 +146,13 @@ export const Bubble = (props: BubbleProps) => {
         {...bubbleProps.theme?.button}
         toggleBot={toggleBot}
         isBotOpened={isBotOpened()}
+        welcomeMessage={{
+          message: "Need help? Let's chat!",
+          delay: 2000,
+          backgroundColor:
+            bubbleProps.theme?.chatWindow?.botMessage?.backgroundColor,
+          textColor: bubbleProps.theme?.chatWindow?.botMessage?.textColor,
+        }}
         avatarSrc={bubbleProps.theme?.chatWindow?.botMessage?.avatarSrc}
       />
       <div

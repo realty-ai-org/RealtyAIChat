@@ -9,6 +9,18 @@ const Config = {
     defaultAvatarSrc:
       "https://cdn.jsdelivr.net/gh/realty-ai-org/RealtyAIChat@main/images/default_avatar.png",
   },
+  theme: {
+    messages: {
+      bot: {
+        defaultBackgroundColor: "#f3f3f3",
+        defaultTextColor: "#303235",
+      },
+      user: {
+        defaultBackgroundColor: "#3B81F6",
+        defaultTextColor: "#ffffff",
+      },
+    },
+  },
 };
 
 export default Config;

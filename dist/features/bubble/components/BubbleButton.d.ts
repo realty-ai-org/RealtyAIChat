@@ -1,6 +1,12 @@
 import { ButtonTheme } from "../types";
 type Props = ButtonTheme & {
     isBotOpened: boolean;
+    welcomeMessage: {
+        message: string;
+        delay?: number;
+        backgroundColor?: string;
+        textColor?: string;
+    };
     avatarSrc?: string;
     toggleBot: () => void;
 };
