@@ -377,6 +377,51 @@
     }
 }
 
+
+@keyframes pulse-dot {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+@keyframes pulse-shadow {
+  0% {
+    box-shadow: 0 0 8px 0 rgba(178, 255, 176, .8);
+  }
+  50% {
+    box-shadow: 0 0 0 0 rgba(178, 255, 176, 0);
+  }
+  100% {
+    box-shadow: 0 0 8px 0 rgba(178, 255, 176, 0.8);
+  }
+}
+.live-dot {
+  position: relative;
+  border-radius: 50%;
+  overflow: hidden;
+  background: radial-gradient(circle, rgb(9, 255, 0) 0%, rgb(13, 241, 6) 30%, rgb(22, 196, 13) 100%);
+}
+.live-dot-animate {
+  background: radial-gradient(circle, rgb(42, 211, 33) 20%, rgb(30, 154, 24) 100%);
+  animation: pulse-shadow 1.5s cubic-bezier(0, 0, 0, 1) infinite;
+}
+.live-dot-animate::after {
+  content: "";
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: radial-gradient(circle, rgb(178, 255, 176) 20%, rgb(12, 242, 0) 100%);
+  animation: pulse-dot 1.5s cubic-bezier(0, 0, 0, 1) infinite;
+}
+
+
 .apimessage,
 .usermessage,
 .usermessagewaiting {

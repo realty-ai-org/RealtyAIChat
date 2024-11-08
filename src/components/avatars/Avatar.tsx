@@ -29,20 +29,17 @@ export const Avatar = (props: {
         class="rounded-full object-cover w-full h-full"
       />
       <Show when={props.isLive && props.liveIcon === "dot"}>
-        <svg
-          viewBox="0 0 24 24"
-          style="position: absolute;top: 84%;left: 84%;transform: translate(-50%, -50%);height: 33%;width: 33%;"
-        >
-          <path
-            fill="#4fff45"
-            d="m2 12a10 10 0 1 1 10 10 10 10 0 0 1 -10-10z"
-          />
-          <path
-            fill="#12c92a"
-            class={props.animate ? "animate-pulse" : ""}
-            d="m2 12a10 10 0 1 1 10 10 10 10 0 0 1 -10-10z"
-          />
-        </svg>
+        <div
+          class={`live-dot ${props.animate ? "live-dot-animate" : ""}`}
+          style={{
+            position: "absolute",
+            top: "84%",
+            left: "84%",
+            transform: "translate(-50%, -50%)",
+            height: "33%",
+            width: "33%",
+          }}
+        />
       </Show>
     </figure>
   );
