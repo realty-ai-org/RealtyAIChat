@@ -1,6 +1,6 @@
 import { JSX } from "solid-js";
 export declare const Avatar: (props: {
-    initialAvatarSrc?: string;
+    src?: string;
     isLive?: boolean;
     liveIcon?: "border" | "dot";
     animate?: boolean;

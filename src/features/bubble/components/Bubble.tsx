@@ -11,6 +11,7 @@ import { BubbleParams } from "../types";
 import { Bot, BotProps } from "../../../components/Bot";
 import { getCookie, setCookie } from "@/utils/index";
 import isMobileCheck from "@/utils/isMobileCheck";
+import { isStreamAvailableQuery } from "@/queries/sendMessageQuery";
 export type BubbleProps = BotProps & BubbleParams;
 
 export const Bubble = (props: BubbleProps) => {
@@ -49,6 +50,8 @@ export const Bubble = (props: BubbleProps) => {
   const [isVisible, setIsVisible] = createSignal(true);
   const [visibleCount, setVisibleCount] = createSignal(0);
   const [hasClosed, setHasClosed] = createSignal(false);
+  const [isChatFlowAvailableToStream, setIsChatFlowAvailableToStream] =
+    createSignal(false);
 
   var openCount = Number(getCookie(count_cookie_name));
   if (!openCount) {
@@ -118,8 +121,23 @@ export const Bubble = (props: BubbleProps) => {
     }
   });
 
+  onMount(() => {
+    const checkStreamAvailability = async () => {
+      const { data } = await isStreamAvailableQuery({
+        chatflowid: props.chatflowid,
+        apiHost: props.apiHost,
+      });
+
+      if (data) {
+        setIsChatFlowAvailableToStream(data?.isStreaming ?? false);
+      }
+    };
+
+    checkStreamAvailability();
+  });
+
   return (
-    <>
+    <Show when={isChatFlowAvailableToStream()}>
       <style>{styles}</style>
       <>
         <link rel="icon" href="data:," />
@@ -179,6 +197,6 @@ export const Bubble = (props: BubbleProps) => {
           />
         </Show>
       </div>
-    </>
+    </Show>
   );
 };

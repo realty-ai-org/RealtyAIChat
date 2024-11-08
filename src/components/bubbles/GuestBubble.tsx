@@ -40,7 +40,7 @@ export const GuestBubble = (props: Props) => {
         }}
       />
       <Show when={props.showAvatar}>
-        <Avatar initialAvatarSrc={props.avatarSrc} />
+        <Avatar src={props.avatarSrc} />
       </Show>
     </div>
   );

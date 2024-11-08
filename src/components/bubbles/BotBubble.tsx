@@ -47,7 +47,7 @@ export const BotBubble = (props: Props) => {
       style={{ "margin-right": "50px" }}
     >
       <Show when={showAvatar}>
-        <Avatar initialAvatarSrc={props.avatarSrc} liveIcon="dot" isLive />
+        <Avatar src={props.avatarSrc} liveIcon="dot" isLive />
       </Show>
       <Show
         when={!props.loading}

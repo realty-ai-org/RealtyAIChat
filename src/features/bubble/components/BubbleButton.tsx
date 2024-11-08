@@ -62,7 +62,7 @@ export const BubbleButton = (props: Props) => {
       </Show>
       <Show when={!props.isBotOpened}>
         <Avatar
-          initialAvatarSrc={props.avatarSrc}
+          src={props.avatarSrc}
           style={{
             height: "100%",
             width: "100%",
