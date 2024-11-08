@@ -12,7 +12,7 @@ import { Avatar } from "@/components/avatars/Avatar";
 import Config from "@/config";
 type Props = ButtonTheme & {
   isBotOpened: boolean;
-  welcomeMessage: {
+  popoutMessage: {
     message: string;
     delay?: number;
     backgroundColor?: string;
@@ -28,17 +28,17 @@ const defaultBottom = 20;
 const defaultRight = 20;
 
 export const BubbleButton = (props: Props) => {
-  const [welcomeMessageVisible, setWelcomeMessageVisible] = createSignal(false);
+  const [popoutMessageVisible, setPopoutMessageVisible] = createSignal(false);
 
   onMount(() => {
     if (props.isBotOpened) {
-      setWelcomeMessageVisible(false);
+      setPopoutMessageVisible(false);
     } else {
       setTimeout(() => {
-        if (!props.isBotOpened && !welcomeMessageVisible()) {
-          setWelcomeMessageVisible(true);
+        if (!props.isBotOpened && !popoutMessageVisible()) {
+          setPopoutMessageVisible(true);
         }
-      }, props.welcomeMessage.delay ?? 2000);
+      }, props.popoutMessage.delay ?? 2000);
     }
   });
 
@@ -46,7 +46,7 @@ export const BubbleButton = (props: Props) => {
 
   return (
     <div class="relative">
-      <Show when={!props.isBotOpened && welcomeMessageVisible()}>
+      <Show when={!props.isBotOpened && popoutMessageVisible()}>
         <div
           class="fixed items-end"
           style={{
@@ -66,15 +66,15 @@ export const BubbleButton = (props: Props) => {
               class="px-4 py-2 ml-2 whitespace-pre-wrap max-w-full chatbot-host-bubble chatbot-welcome-message"
               style={{
                 "background-color":
-                  props.welcomeMessage.backgroundColor ??
+                  props.popoutMessage.backgroundColor ??
                   Config.theme.messages.bot.defaultBackgroundColor,
                 color:
-                  props.welcomeMessage.textColor ??
+                  props.popoutMessage.textColor ??
                   Config.theme.messages.bot.defaultTextColor,
                 "box-shadow": "0px 0px 10px 0px rgba(0, 0, 0, 0.1)",
               }}
             >
-              {props.welcomeMessage.message}
+              {props.popoutMessage.message}
             </div>
           </div>
         </div>
@@ -84,13 +84,13 @@ export const BubbleButton = (props: Props) => {
         onClick={() => {
           if (!isMobileCheck()) {
             props.toggleBot();
-            setWelcomeMessageVisible(false);
+            setPopoutMessageVisible(false);
           }
         }}
         onTouchStart={() => {
           if (isMobileCheck()) {
             props.toggleBot();
-            setWelcomeMessageVisible(false);
+            setPopoutMessageVisible(false);
           }
         }}
         class={

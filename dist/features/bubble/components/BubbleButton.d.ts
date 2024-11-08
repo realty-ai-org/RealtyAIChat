@@ -1,7 +1,7 @@
 import { ButtonTheme } from "../types";
 type Props = ButtonTheme & {
     isBotOpened: boolean;
-    welcomeMessage: {
+    popoutMessage: {
         message: string;
         delay?: number;
         backgroundColor?: string;

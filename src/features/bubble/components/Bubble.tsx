@@ -146,12 +146,14 @@ export const Bubble = (props: BubbleProps) => {
         {...bubbleProps.theme?.button}
         toggleBot={toggleBot}
         isBotOpened={isBotOpened()}
-        welcomeMessage={{
-          message: "Need help? Let's chat!",
-          delay: 2000,
+        popoutMessage={{
+          message:
+            bubbleProps.theme?.popoutMessage?.message ??
+            "Need help? Let's chat!",
+          delay: bubbleProps.theme?.popoutMessage?.delay ?? 2000,
           backgroundColor:
-            bubbleProps.theme?.chatWindow?.botMessage?.backgroundColor,
-          textColor: bubbleProps.theme?.chatWindow?.botMessage?.textColor,
+            bubbleProps.theme?.popoutMessage?.backgroundColor ?? "#f3f3f3",
+          textColor: bubbleProps.theme?.popoutMessage?.textColor ?? "#000000",
         }}
         avatarSrc={bubbleProps.theme?.chatWindow?.botMessage?.avatarSrc}
       />
@@ -188,6 +190,7 @@ export const Bubble = (props: BubbleProps) => {
             textInput={bubbleProps.theme?.chatWindow?.textInput}
             botMessage={bubbleProps.theme?.chatWindow?.botMessage}
             userMessage={bubbleProps.theme?.chatWindow?.userMessage}
+            popoutMessage={bubbleProps.theme?.popoutMessage}
             fontSize={bubbleProps.theme?.chatWindow?.fontSize}
             chatflowid={props.chatflowid}
             chatflowConfig={props.chatflowConfig}

@@ -13,6 +13,7 @@ import { LoadingBubble } from "./bubbles/LoadingBubble";
 import { SourceBubble } from "./bubbles/SourceBubble";
 import {
   BotMessageTheme,
+  PopoutMessageTheme,
   TextInputTheme,
   UserMessageTheme,
 } from "@/features/bubble/types";
@@ -43,6 +44,7 @@ export type BotProps = {
   welcomeMessage?: string;
   botMessage?: BotMessageTheme;
   userMessage?: UserMessageTheme;
+  popoutMessage?: PopoutMessageTheme;
   textInput?: TextInputTheme;
   poweredByTextColor?: string;
   badgeBackgroundColor?: string;
