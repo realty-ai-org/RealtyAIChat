@@ -12,7 +12,7 @@ type Props = {
   loading?: boolean;
 };
 
-const defaultBackgroundColor = "#f7f8ff";
+const defaultBackgroundColor = "#f3f3f3";
 const defaultTextColor = "#303235";
 
 Marked.setOptions({ isNoP: true });
@@ -49,7 +49,15 @@ export const BotBubble = (props: Props) => {
       <Show when={showAvatar}>
         <Avatar initialAvatarSrc={props.avatarSrc} liveIcon="dot" isLive />
       </Show>
-      <Show when={!props.loading} fallback={<LoadingBubble />}>
+      <Show
+        when={!props.loading}
+        fallback={
+          <LoadingBubble
+            backgroundColor={props.backgroundColor ?? defaultBackgroundColor}
+            textColor={props.textColor ?? defaultTextColor}
+          />
+        }
+      >
         <span
           ref={botMessageEl}
           class="px-4 py-2 ml-2 whitespace-pre-wrap max-w-full chatbot-host-bubble"
@@ -57,7 +65,6 @@ export const BotBubble = (props: Props) => {
           style={{
             "background-color": props.backgroundColor ?? defaultBackgroundColor,
             color: props.textColor ?? defaultTextColor,
-            "border-radius": "6px",
           }}
         />
       </Show>

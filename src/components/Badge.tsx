@@ -41,45 +41,6 @@ export const Badge = (props: Props) => {
     if (observer) observer.disconnect();
   });
 
-  const default_text = (
-    <div class="flex items-center justify-center gap-2">
-      <div class="leading-4">Powered by</div>
-      <a
-        ref={liteBadge}
-        href={"https://www.realty-ai.ca"}
-        target="_blank"
-        rel="noopener noreferrer"
-        class="lite-badge"
-        id="lite-badge"
-        style={{
-          "font-weight": "bold",
-          color: props.poweredByTextColor ?? defaultTextColor,
-        }}
-      >
-        <img
-          src="/src/assets/realty_ai_logo_horizontal_xs.png"
-          alt="Realty AI"
-          class="h-4"
-        />
-        {/* <span>Realty AI</span> */}
-      </a>
-    </div>
-  );
-
-  const badge_text = props.badgeText ? (
-    <span
-      class="leading-4"
-      style={{
-        "font-weight": "bold",
-        color: props.poweredByTextColor ?? defaultTextColor,
-      }}
-    >
-      {props.badgeText}
-    </span>
-  ) : (
-    default_text
-  );
-
   return (
     <div
       class="w-full h-10 flex items-center justify-center text-center"
@@ -91,7 +52,35 @@ export const Badge = (props: Props) => {
         "background-color": props.badgeBackgroundColor ?? "#ffffff",
       }}
     >
-      {badge_text}
+      {props.badgeText ? (
+        <span
+          class="leading-4"
+          style={{
+            "font-weight": "bold",
+            color: props.poweredByTextColor ?? defaultTextColor,
+          }}
+        >
+          {props.badgeText}
+        </span>
+      ) : (
+        <span class="leading-4">
+          Powered by{" "}
+          <a
+            ref={liteBadge}
+            href={"https://www.realty-ai.ca"}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="lite-badge"
+            id="lite-badge"
+            style={{
+              "font-weight": "bold",
+              color: props.poweredByTextColor ?? defaultTextColor,
+            }}
+          >
+            <span>Realty AI</span>
+          </a>
+        </span>
+      )}
     </div>
   );
 };

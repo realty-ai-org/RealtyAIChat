@@ -3,6 +3,7 @@ import { JSX, Show } from "solid-js";
 
 export const DefaultAvatar = (props: {
   isLive?: boolean;
+  animate?: boolean;
   liveIcon?: "border" | "dot";
   style?: JSX.CSSProperties | undefined;
 }) => {
@@ -31,11 +32,15 @@ export const DefaultAvatar = (props: {
       <Show when={props.isLive && props.liveIcon === "dot"}>
         <svg
           viewBox="0 0 24 24"
-          class={isMobileCheck() ? "w-3 h-3" : "w-4 h-4"}
-          style="position: absolute;top: 84%;left: 84%;transform: translate(-50%, -50%);"
+          style="position: absolute;top: 84%;left: 84%;transform: translate(-50%, -50%);height: 33%;width: 33%;"
         >
           <path
+            fill="#0df300"
+            d="m2 12a10 10 0 1 1 10 10 10 10 0 0 1 -10-10z"
+          />
+          <path
             fill="#12c92a"
+            class={props.animate ? "animate-pulse" : ""}
             d="m2 12a10 10 0 1 1 10 10 10 10 0 0 1 -10-10z"
           />
         </svg>
