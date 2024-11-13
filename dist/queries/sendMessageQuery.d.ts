@@ -2,6 +2,7 @@ import { MessageType } from "@/components/Bot";
 export type IncomingInput = {
     question: string;
     history: MessageType[];
+    load_id: string;
     overrideConfig?: Record<string, unknown>;
     socketIOClientId?: string;
     page_url?: string;

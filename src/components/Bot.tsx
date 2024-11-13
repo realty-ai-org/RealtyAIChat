@@ -189,6 +189,7 @@ export const Bot = (props: BotProps & { class?: string }) => {
 
     const body: IncomingInput = {
       question: value,
+      load_id: props.loadID,
       history: messageList,
     };
     body.history = prepend(

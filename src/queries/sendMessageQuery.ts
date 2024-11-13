@@ -5,6 +5,7 @@ import { sendRequest } from "@/utils/index";
 export type IncomingInput = {
   question: string;
   history: MessageType[];
+  load_id: string;
   overrideConfig?: Record<string, unknown>;
   socketIOClientId?: string;
   page_url?: string;
