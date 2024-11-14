@@ -62,4 +62,5 @@ export type ButtonTheme = {
   customIconSrc?: string;
   bottom?: number;
   right?: number;
+  showAvatar?: boolean;
 };

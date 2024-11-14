@@ -155,6 +155,7 @@ export const Bubble = (props: BubbleProps) => {
             bubbleProps.theme?.popoutMessage?.backgroundColor ?? "#f3f3f3",
           textColor: bubbleProps.theme?.popoutMessage?.textColor ?? "#000000",
         }}
+        showAvatar={bubbleProps.theme?.button?.showAvatar ?? true}
         avatarSrc={bubbleProps.theme?.chatWindow?.botMessage?.avatarSrc}
       />
       <div

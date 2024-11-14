@@ -55,5 +55,6 @@ export type ButtonTheme = {
     customIconSrc?: string;
     bottom?: number;
     right?: number;
+    showAvatar?: boolean;
 };
 //# sourceMappingURL=types.d.ts.map

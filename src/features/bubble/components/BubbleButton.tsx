@@ -130,18 +130,56 @@ export const BubbleButton = (props: Props) => {
           </svg>
         </Show>
         <Show when={!props.isBotOpened}>
-          <Avatar
-            src={props.avatarSrc}
-            style={{
-              height: "100%",
-              width: "100%",
-            }}
-            liveIcon="dot"
-            isLive
-            animate
-          />
+          <Show
+            when={props.showAvatar}
+            fallback={
+              <>
+                <Show when={isNotDefined(props.customIconSrc)} keyed>
+                  <svg
+                    viewBox="0 0 24 24"
+                    style={{
+                      stroke: props.iconColor ?? defaultIconColor,
+                    }}
+                    class={
+                      `stroke-2 fill-transparent absolute duration-200 transition ` +
+                      (props.isBotOpened
+                        ? "scale-0 opacity-0"
+                        : "scale-100 opacity-100") +
+                      (props.size === "large" ? " w-11 h-11" : " w-9 h-9")
+                    }
+                  >
+                    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
+                  </svg>
+                </Show>
+                <Show when={props.customIconSrc}>
+                  <img
+                    src={props.customIconSrc}
+                    class={
+                      "rounded-full object-cover" +
+                      (props.isBotOpened
+                        ? "scale-0 opacity-0"
+                        : "scale-100 opacity-100") +
+                      (props.size === "large" ? " w-11 h-11" : " w-9 h-9")
+                    }
+                    alt="Bubble button icon"
+                  />
+                </Show>
+              </>
+            }
+          >
+            <Avatar
+              src={props.avatarSrc}
+              style={{
+                height: "100%",
+                width: "100%",
+              }}
+              liveIcon="dot"
+              isLive
+              animate
+            />
+          </Show>
         </Show>
-        <Show when={!props.isBotOpened && props.customIconSrc}>
+        {/* <Show when={!props.isBotOpened && props.customIconSrc}>
           <img
             src={props.customIconSrc}
             class={
@@ -152,7 +190,7 @@ export const BubbleButton = (props: Props) => {
               (props.size === "large" ? " w-11 h-11" : " w-9 h-9")
             }
           />
-        </Show>
+        </Show> */}
         <svg
           viewBox="0 0 24 24"
           style={{ fill: props.iconColor ?? "white" }}
