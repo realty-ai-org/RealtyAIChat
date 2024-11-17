@@ -11,6 +11,7 @@ export type BubbleParams = {
 export type BubbleTheme = {
     chatWindow?: ChatWindowTheme;
     button?: ButtonTheme;
+    popoutMessage?: PopoutMessageTheme;
 };
 export type TextInputTheme = {
     backgroundColor?: string;
@@ -30,6 +31,12 @@ export type BotMessageTheme = {
     showAvatar?: boolean;
     avatarSrc?: string;
 };
+export type PopoutMessageTheme = {
+    message?: string;
+    delay?: number;
+    backgroundColor?: string;
+    textColor?: string;
+};
 export type ChatWindowTheme = {
     welcomeMessage?: string;
     backgroundColor?: string;
@@ -42,11 +49,12 @@ export type ChatWindowTheme = {
     poweredByTextColor?: string;
 };
 export type ButtonTheme = {
-    size?: 'medium' | 'large';
+    size?: "medium" | "large";
     backgroundColor?: string;
     iconColor?: string;
     customIconSrc?: string;
     bottom?: number;
     right?: number;
+    showAvatar?: boolean;
 };
 //# sourceMappingURL=types.d.ts.map

@@ -1,57 +1,66 @@
 export type BubbleParams = {
-    defaultOpenDesktop:boolean,
-    defaultOpenMobile:boolean,
-    delayOpenFlag: boolean, 
-    delayOpenSeconds:number,
-    stayClosedFlag:boolean,
-    theme?: BubbleTheme,
-    maxPopups?: number,
-    badgeText?: string
-}
+  defaultOpenDesktop: boolean;
+  defaultOpenMobile: boolean;
+  delayOpenFlag: boolean;
+  delayOpenSeconds: number;
+  stayClosedFlag: boolean;
+  theme?: BubbleTheme;
+  maxPopups?: number;
+  badgeText?: string;
+};
 
 export type BubbleTheme = {
-    chatWindow?: ChatWindowTheme
-    button?: ButtonTheme
-}
+  chatWindow?: ChatWindowTheme;
+  button?: ButtonTheme;
+  popoutMessage?: PopoutMessageTheme;
+};
 
 export type TextInputTheme = {
-    backgroundColor?: string
-    textColor?: string
-    placeholder?: string
-    sendButtonColor?: string
-}
+  backgroundColor?: string;
+  textColor?: string;
+  placeholder?: string;
+  sendButtonColor?: string;
+};
 
 export type UserMessageTheme = {
-    backgroundColor?: string
-    textColor?: string
-    showAvatar?: boolean
-    avatarSrc?: string
-}
+  backgroundColor?: string;
+  textColor?: string;
+  showAvatar?: boolean;
+  avatarSrc?: string;
+};
 
 export type BotMessageTheme = {
-    backgroundColor?: string
-    textColor?: string
-    showAvatar?: boolean
-    avatarSrc?: string
-}
+  backgroundColor?: string;
+  textColor?: string;
+  showAvatar?: boolean;
+  avatarSrc?: string;
+};
+
+export type PopoutMessageTheme = {
+  message?: string;
+  delay?: number;
+  backgroundColor?: string;
+  textColor?: string;
+};
 
 export type ChatWindowTheme = {
-    welcomeMessage?: string
-    backgroundColor?: string
-    height?: number
-    width?: number
-    fontSize?: number
-    userMessage?: UserMessageTheme
-    botMessage?: BotMessageTheme
-    textInput?: TextInputTheme
-    poweredByTextColor?: string
-}
+  welcomeMessage?: string;
+  backgroundColor?: string;
+  height?: number;
+  width?: number;
+  fontSize?: number;
+  userMessage?: UserMessageTheme;
+  botMessage?: BotMessageTheme;
+  textInput?: TextInputTheme;
+  poweredByTextColor?: string;
+};
 
 export type ButtonTheme = {
-    size?: 'medium' | 'large'
-    backgroundColor?: string
-    iconColor?: string
-    customIconSrc?: string
-    bottom?: number
-    right?: number
-}
+  size?: "medium" | "large";
+  backgroundColor?: string;
+  iconColor?: string;
+  customIconSrc?: string;
+  bottom?: number;
+  right?: number;
+  showAvatar?: boolean;
+};
