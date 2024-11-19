@@ -1,168 +1,213 @@
-import { createSignal, Show, splitProps, onMount, createEffect } from 'solid-js'
-import styles from '../../../assets/index.css'
-import { BubbleButton } from './BubbleButton'
-import { BubbleParams } from '../types'
-import { Bot, BotProps } from '../../../components/Bot'
-import { getCookie, setCookie } from '@/utils/index'
-import isMobileCheck from '@/utils/isMobileCheck'
-export type BubbleProps = BotProps & BubbleParams
+import {
+  createSignal,
+  Show,
+  splitProps,
+  onMount,
+  createEffect,
+} from "solid-js";
+import styles from "../../../assets/index.css";
+import { BubbleButton } from "./BubbleButton";
+import { BubbleParams } from "../types";
+import { Bot, BotProps } from "../../../components/Bot";
+import { getCookie, setCookie } from "@/utils/index";
+import isMobileCheck from "@/utils/isMobileCheck";
+import { isStreamAvailableQuery } from "@/queries/sendMessageQuery";
+export type BubbleProps = BotProps & BubbleParams;
 
 export const Bubble = (props: BubbleProps) => {
-    const [bubbleProps] = splitProps(props, ['theme'])
-    //check cookie for how many times the site as been loaded
-    // const numLoadedCookie: string =  getCookie("numLoadedChat");
-    // let numLoaded: number  = parseInt(numLoadedCookie);
-    // numLoaded = numLoaded ? numLoaded : 0; 
-    
-    
-    //const isMobile =  window?.innerWidth ? (window?.innerWidth < 1000): false;
-    const isMobile = isMobileCheck()
-    console.log("is mobile",isMobile)
-    const height_calc = isMobile? "calc(min(350px, max(100% - 100px,275px)))" : "calc(min(500px, max(100% - 100px,300px)))"
-    
-    let defaultOpen = isMobile? props.defaultOpenMobile : props.defaultOpenDesktop
-    // grab cookie to check if bot has been closed before
-    const cookie_name = `realty-ai-bot-closed-${props.userID}`
-    const count_cookie_name = `realty-ai-bot-open-count-${props.userID}`
-    console.log("checking:",cookie_name)
-    
-    const bot_closed_before = getCookie(cookie_name)
-    console.log("bot previously closed",bot_closed_before)
-    if ((bot_closed_before ==="true") && props.stayClosedFlag){
-        defaultOpen = false
+  const [bubbleProps] = splitProps(props, ["theme"]);
+  //check cookie for how many times the site as been loaded
+  // const numLoadedCookie: string =  getCookie("numLoadedChat");
+  // let numLoaded: number  = parseInt(numLoadedCookie);
+  // numLoaded = numLoaded ? numLoaded : 0;
+
+  //const isMobile =  window?.innerWidth ? (window?.innerWidth < 1000): false;
+  const isMobile = isMobileCheck();
+  console.log("is mobile", isMobile);
+  const height_calc = isMobile
+    ? "calc(min(350px, max(100% - 100px,275px)))"
+    : "calc(min(500px, max(100% - 100px,300px)))";
+
+  let defaultOpen = isMobile
+    ? props.defaultOpenMobile
+    : props.defaultOpenDesktop;
+  // grab cookie to check if bot has been closed before
+  const cookie_name = `realty-ai-bot-closed-${props.userID}`;
+  const count_cookie_name = `realty-ai-bot-open-count-${props.userID}`;
+  console.log("checking:", cookie_name);
+
+  const bot_closed_before = getCookie(cookie_name);
+  console.log("bot previously closed", bot_closed_before);
+  if (bot_closed_before === "true" && props.stayClosedFlag) {
+    defaultOpen = false;
+  }
+
+  console.log(props);
+
+  //isOpen = false
+  const [isBotOpened, setIsBotOpened] = createSignal(defaultOpen);
+  const [isBotStarted, setIsBotStarted] = createSignal(defaultOpen);
+  const [isVisible, setIsVisible] = createSignal(true);
+  const [visibleCount, setVisibleCount] = createSignal(0);
+  const [hasClosed, setHasClosed] = createSignal(false);
+  const [isChatFlowAvailableToStream, setIsChatFlowAvailableToStream] =
+    createSignal(false);
+
+  var openCount = Number(getCookie(count_cookie_name));
+  if (!openCount) {
+    openCount = 0;
+  }
+
+  const openBot = () => {
+    if (!isBotStarted()) setIsBotStarted(true);
+    openCount += 1;
+    setCookie(count_cookie_name, openCount.toString(), 1 / 48);
+    setIsBotOpened(true);
+  };
+
+  const timedOpenBot = () => {
+    console.log("Delayed Bot Popup");
+
+    if (props.stayClosedFlag && bot_closed_before === "true") {
+      console.log("No Popup - previously closed");
+      return;
     }
 
-    //isOpen = false
-    const [isBotOpened, setIsBotOpened] = createSignal(defaultOpen)
-    const [isBotStarted, setIsBotStarted] = createSignal(defaultOpen)
-    const [isVisible,setIsVisible] = createSignal(true)
-    const [visibleCount,setVisibleCount] = createSignal(0)
-    const [hasClosed,setHasClosed] = createSignal(false)
-    
-    var openCount = Number(getCookie(count_cookie_name))
-    if(!openCount){
-        openCount = 0
+    const maxPopups = props.maxPopups ? props.maxPopups : 0;
+    if (maxPopups <= openCount && maxPopups > 0) {
+      console.log("Max Popups", maxPopups);
+      console.log("No Popup - exceeded max popups");
+      return;
     }
 
-    const openBot = () => {
-        if (!isBotStarted()) setIsBotStarted(true)
-        openCount +=1
-        setCookie(count_cookie_name,openCount.toString(),1/48)
-        setIsBotOpened(true)
+    console.log(props.delayOpenFlag);
+    if (props.delayOpenFlag && !isBotOpened() && !hasClosed()) {
+      openBot();
+    } else {
+      console.log("No Popup - open and closed already");
     }
+  };
 
+  if (props.delayOpenFlag) {
+    setTimeout(timedOpenBot, props.delayOpenSeconds * 1000); //convert to mills
+  }
 
+  const closeBot = () => {
+    setIsBotOpened(false);
+    setHasClosed(true);
+    setCookie(cookie_name, "true", 1);
+  };
 
-    const timedOpenBot = () => {
-        console.log("Delayed Bot Popup")
+  const toggleBot = () => {
+    isBotOpened() ? closeBot() : openBot();
+    setVisibleCount(0);
+  };
 
-        if (props.stayClosedFlag && (bot_closed_before === "true")){
-            console.log("No Popup - previously closed")
-            return
+  // check if visibility is changing and update count
+  const updateVisible = () => {
+    setIsVisible(document.visibilityState === "visible");
+    if (isVisible() === (document.visibilityState === "visible")) {
+      setVisibleCount((x) => Math.min(x + 1, 3));
+    }
+  };
+  // event listener for changes in visibility
+  document.addEventListener("visibilitychange", updateVisible);
+
+  // if count is creater than two ie switched tabs twice then close bot window
+  createEffect(() => {
+    if (visibleCount() > 2) {
+      // console.log("closed window because of toggling tab");
+      closeBot();
+    }
+  });
+
+  onMount(() => {
+    const checkStreamAvailability = async () => {
+      const { data } = await isStreamAvailableQuery({
+        chatflowid: props.chatflowid,
+        apiHost: props.apiHost,
+      });
+
+      if (data) {
+        setIsChatFlowAvailableToStream(data?.isStreaming ?? false);
+      }
+    };
+
+    checkStreamAvailability();
+  });
+
+  return (
+    <Show when={isChatFlowAvailableToStream()}>
+      <style>{styles}</style>
+      <>
+        <link rel="icon" href="data:," />
+      </>
+      <BubbleButton
+        {...bubbleProps.theme?.button}
+        toggleBot={toggleBot}
+        isBotOpened={isBotOpened()}
+        popoutMessage={{
+          message:
+            bubbleProps.theme?.popoutMessage?.message ??
+            "Need help? Let's chat!",
+          delay: bubbleProps.theme?.popoutMessage?.delay ?? 2000,
+          backgroundColor:
+            bubbleProps.theme?.popoutMessage?.backgroundColor ?? "#f3f3f3",
+          textColor: bubbleProps.theme?.popoutMessage?.textColor ?? "#000000",
+        }}
+        showAvatar={bubbleProps.theme?.button?.showAvatar ?? true}
+        avatarSrc={bubbleProps.theme?.chatWindow?.botMessage?.avatarSrc}
+      />
+      <div
+        part="bot" //ADD CHANGE TO HIGH LINE BASED ON IS MOBILE
+        style={{
+          height: bubbleProps.theme?.chatWindow?.height
+            ? `${bubbleProps.theme?.chatWindow?.height.toString()}px`
+            : height_calc,
+          transition:
+            "transform 200ms cubic-bezier(0, 1.2, 1, 1), opacity 150ms ease-out",
+          "transform-origin": "bottom right",
+          transform: isBotOpened() ? "scale3d(1, 1, 1)" : "scale3d(0, 0, 1)",
+          "box-shadow": "rgb(0 0 0 / 16%) 0px 5px 40px",
+          "background-color":
+            bubbleProps.theme?.chatWindow?.backgroundColor || "#ffffff",
+          "z-index": 42424242,
+        }}
+        class={
+          `fixed sm:right-5 rounded-lg w-full sm:w-[400px] max-h-[704px] overflow-hidden` +
+          (isBotOpened() ? " opacity-1" : " opacity-0 pointer-events-none") +
+          (props.theme?.button?.size === "large" ? " bottom-28" : " bottom-24")
         }
-        
-        const maxPopups = props.maxPopups  ? props.maxPopups : 0
-        if((maxPopups <= openCount) && maxPopups > 0){
-            console.log("Max Popups",maxPopups)
-            console.log("No Popup - exceeded max popups")
-            return
-        }
-
-        console.log(props.delayOpenFlag)
-        if (props.delayOpenFlag && (!isBotOpened()) && (!hasClosed())){
-            openBot()
-        }else{
-            console.log("No Popup - open and closed already")
-        }
-    }
-
-
-    if (props.delayOpenFlag){
-        setTimeout(timedOpenBot,props.delayOpenSeconds*1000) //convert to mills
-    }
-
-
-
-    const closeBot = () => {
-        setIsBotOpened(false)
-        setHasClosed(true)
-        setCookie(cookie_name,"true",1)
-    }
-
-    const toggleBot = () => {
-        isBotOpened() ? closeBot() : openBot();
-        setVisibleCount(0);
-    }
-
-
-    // check if visibility is changing and update count
-    const updateVisible = () =>{
-        setIsVisible(document.visibilityState === 'visible')
-        if (isVisible() ===(document.visibilityState === 'visible')){
-            setVisibleCount((x)=>  Math.min(x + 1, 3))
-        }
-    }
-    // event listener for changes in visibility
-    document.addEventListener("visibilitychange",updateVisible)
-
-    // if count is creater than two ie switched tabs twice then close bot window
-    createEffect(() =>{ 
-        if(visibleCount() > 2 ){
-            // console.log("closed window because of toggling tab");
-            closeBot();
-        }
-    })
-
-    
-    return (
-        <>
-            <style>{styles}</style>
-            <>
-                <link rel="icon" href="data:,"/>
-            </>
-            <BubbleButton {...bubbleProps.theme?.button} toggleBot={toggleBot} isBotOpened={isBotOpened()} />
-            <div
-                part='bot' //ADD CHANGE TO HIGH LINE BASED ON IS MOBILE 
-                style={{
-                    height: bubbleProps.theme?.chatWindow?.height ? `${bubbleProps.theme?.chatWindow?.height.toString()}px` : height_calc,
-                    transition: 'transform 200ms cubic-bezier(0, 1.2, 1, 1), opacity 150ms ease-out',
-                    'transform-origin': 'bottom right',
-                    transform: isBotOpened() ? 'scale3d(1, 1, 1)' : 'scale3d(0, 0, 1)',
-                    'box-shadow': 'rgb(0 0 0 / 16%) 0px 5px 40px',
-                    'background-color': bubbleProps.theme?.chatWindow?.backgroundColor || '#ffffff',
-                    'z-index': 42424242
-                }}
-                class={
-                    `fixed sm:right-5 rounded-lg w-full sm:w-[400px] max-h-[704px]` +
-                    (isBotOpened()? ' opacity-1' : ' opacity-0 pointer-events-none') +
-                    (props.theme?.button?.size === 'large' ? ' bottom-24' : ' bottom-20')
-                }
-            >
-                <Show when={isBotStarted()}>
-                    <Bot
-                        badgeBackgroundColor={bubbleProps.theme?.chatWindow?.backgroundColor}
-                        welcomeMessage={bubbleProps.theme?.chatWindow?.welcomeMessage}
-                        poweredByTextColor={bubbleProps.theme?.chatWindow?.poweredByTextColor}
-                        textInput={bubbleProps.theme?.chatWindow?.textInput}
-                        botMessage={bubbleProps.theme?.chatWindow?.botMessage}
-                        userMessage={bubbleProps.theme?.chatWindow?.userMessage}
-                        fontSize={bubbleProps.theme?.chatWindow?.fontSize}
-                        chatflowid={props.chatflowid}
-                        chatflowConfig={props.chatflowConfig}
-                        apiHost={props.apiHost} 
-                        closeBoxFunction={closeBot}
-                        includeQuestions={props.includeQuestions}
-                        fullScreen = {false}
-                        userID = {props.userID}
-                        loadID = {props.loadID}
-                        questions = {props.questions}
-                        mobileQuestionFontSize={props.mobileQuestionFontSize}
-                        desktopQuestionFontSize={props.desktopQuestionFontSize}
-                        badgeText = {props.badgeText}
-                        />
-
-                </Show>
-            </div>
-        </>
-    )
-}
+      >
+        <Show when={isBotStarted()}>
+          <Bot
+            badgeBackgroundColor={
+              bubbleProps.theme?.chatWindow?.backgroundColor
+            }
+            welcomeMessage={bubbleProps.theme?.chatWindow?.welcomeMessage}
+            poweredByTextColor={
+              bubbleProps.theme?.chatWindow?.poweredByTextColor
+            }
+            textInput={bubbleProps.theme?.chatWindow?.textInput}
+            botMessage={bubbleProps.theme?.chatWindow?.botMessage}
+            userMessage={bubbleProps.theme?.chatWindow?.userMessage}
+            popoutMessage={bubbleProps.theme?.popoutMessage}
+            fontSize={bubbleProps.theme?.chatWindow?.fontSize}
+            chatflowid={props.chatflowid}
+            chatflowConfig={props.chatflowConfig}
+            apiHost={props.apiHost}
+            closeBoxFunction={closeBot}
+            includeQuestions={props.includeQuestions}
+            fullScreen={false}
+            userID={props.userID}
+            loadID={props.loadID}
+            questions={props.questions}
+            mobileQuestionFontSize={props.mobileQuestionFontSize}
+            desktopQuestionFontSize={props.desktopQuestionFontSize}
+            badgeText={props.badgeText}
+          />
+        </Show>
+      </div>
+    </Show>
+  );
+};

@@ -1,33 +1,46 @@
-import isMobileCheck from '@/utils/isMobileCheck'
-import { createEffect, createSignal, Show } from 'solid-js'
-import { isNotEmpty } from '@/utils/index'
-import { DefaultAvatar } from './DefaultAvatar'
+import isMobileCheck from "@/utils/isMobileCheck";
+import { Show, JSX } from "solid-js";
+import Config from "@/config";
 
-export const Avatar = (props: { initialAvatarSrc?: string }) => {
-  const [avatarSrc, setAvatarSrc] = createSignal(props.initialAvatarSrc)
-
-  createEffect(() => {
-    if (
-      avatarSrc()?.startsWith('{{') &&
-      props.initialAvatarSrc?.startsWith('http')
-    )
-      setAvatarSrc(props.initialAvatarSrc)
-  })
-
+export const Avatar = (props: {
+  src?: string;
+  isLive?: boolean;
+  liveIcon?: "border" | "dot";
+  animate?: boolean;
+  style?: JSX.CSSProperties | undefined;
+}) => {
   return (
-    <Show when={isNotEmpty(avatarSrc())} keyed fallback={<DefaultAvatar />}>
-      <figure
-        class={
-          'flex justify-center items-center rounded-full text-white relative flex-shrink-0 ' +
-          (isMobileCheck() ? 'w-6 h-6 text-sm' : 'w-10 h-10 text-xl')
-        }
-      >
-        <img
-          src={avatarSrc()}
-          alt="Bot avatar"
-          class="rounded-full object-cover w-full h-full"
+    <figure
+      class={
+        "flex justify-center items-center rounded-full text-white relative flex-shrink-0 " +
+        (isMobileCheck() ? "w-8 h-8 text-sm" : "w-10 h-10 text-xl")
+      }
+      style={{
+        ...(props.style || {}),
+        ...(props.isLive &&
+          props.liveIcon === "border" && {
+            border: "3px solid #12c92a",
+          }),
+      }}
+    >
+      <img
+        src={props.src || Config.bot.defaultAvatarSrc}
+        alt="Bot avatar"
+        class="rounded-full object-cover w-full h-full"
+      />
+      <Show when={props.isLive && props.liveIcon === "dot"}>
+        <div
+          class={`live-dot ${props.animate ? "live-dot-animate" : ""}`}
+          style={{
+            position: "absolute",
+            top: "84%",
+            left: "84%",
+            transform: "translate(-50%, -50%)",
+            height: "33%",
+            width: "33%",
+          }}
         />
-      </figure>
-    </Show>
-  )
-}
+      </Show>
+    </figure>
+  );
+};
