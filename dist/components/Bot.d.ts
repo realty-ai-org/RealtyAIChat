@@ -1,4 +1,4 @@
-import { BotMessageTheme, TextInputTheme, UserMessageTheme } from "@/features/bubble/types";
+import { BotMessageTheme, PopoutMessageTheme, TextInputTheme, UserMessageTheme } from "@/features/bubble/types";
 type messageType = "apiMessage" | "userMessage" | "usermessagewaiting";
 export type MessageType = {
     message: string;
@@ -20,6 +20,7 @@ export type BotProps = {
     welcomeMessage?: string;
     botMessage?: BotMessageTheme;
     userMessage?: UserMessageTheme;
+    popoutMessage?: PopoutMessageTheme;
     textInput?: TextInputTheme;
     poweredByTextColor?: string;
     badgeBackgroundColor?: string;
