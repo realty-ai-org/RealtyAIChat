@@ -21,7 +21,8 @@ export const Badge = (props: Props) => {
           liteBadge &&
           removedNode.id == "lite-badge"
         ) {
-          console.log("Sorry, you can't remove the brand 😅");
+          // prettier-ignore
+          console.log("%c[REALTY-AI-BOT]", "color: #3B81F6; font-weight: bold;", "Sorry, you can't remove the brand 😅");
           props.botContainer?.append(liteBadge);
         }
       });

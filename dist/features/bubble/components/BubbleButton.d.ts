@@ -1,12 +1,9 @@
-import { ButtonTheme } from "../types";
+import { ButtonTheme, PopoutMessageConfig, PopoutMessageTheme } from "../types";
 type Props = ButtonTheme & {
+    userID: string;
     isBotOpened: boolean;
-    popoutMessage: {
-        message: string;
-        delay?: number;
-        backgroundColor?: string;
-        textColor?: string;
-    };
+    popoutMessageConfig: PopoutMessageConfig | undefined;
+    popoutMessageTheme: PopoutMessageTheme;
     avatarSrc?: string;
     toggleBot: () => void;
 };

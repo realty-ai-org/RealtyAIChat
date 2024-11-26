@@ -20,6 +20,9 @@ const Config = {
         defaultTextColor: "#ffffff",
       },
     },
+    popoutMessage: {
+      defaultBackgroundColor: "#f3f3f3",
+    },
   },
 };
 

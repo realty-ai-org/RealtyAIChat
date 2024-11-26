@@ -12,4 +12,6 @@ export declare const sendRequest: <ResponseData>(params: {
 }>;
 export declare const getCookie: (name: string) => string;
 export declare const setCookie: (name: string, value: string, daysToLive: number) => void;
+export declare const lightOrDark: (color: string) => "light" | "dark";
+export declare const getContrastingColor: (color: string) => "#000" | "#fff";
 //# sourceMappingURL=index.d.ts.map

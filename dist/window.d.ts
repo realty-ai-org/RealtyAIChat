@@ -1,3 +1,4 @@
+import { PopoutMessageConfig } from "./features/bubble/types";
 type BotProps = {
     chatflowid: string;
     includeQuestions: boolean;
@@ -13,6 +14,7 @@ type BotProps = {
     theme?: Record<string, unknown>;
     questions?: Array<string>;
     maxPopups?: number;
+    popoutMessageConfig?: PopoutMessageConfig;
     mobileQuestionFontSize?: string;
     desktopQuestionFontSize?: string;
     badgeText?: string;

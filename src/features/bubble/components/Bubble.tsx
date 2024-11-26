@@ -12,10 +12,12 @@ import { Bot, BotProps } from "../../../components/Bot";
 import { getCookie, setCookie } from "@/utils/index";
 import isMobileCheck from "@/utils/isMobileCheck";
 import { isStreamAvailableQuery } from "@/queries/sendMessageQuery";
+import Config from "@/config";
 export type BubbleProps = BotProps & BubbleParams;
 
 export const Bubble = (props: BubbleProps) => {
-  const [bubbleProps] = splitProps(props, ["theme"]);
+  const [bubbleProps] = splitProps(props, ["theme", "popoutMessageConfig"]);
+  const [popoutConfigProps] = splitProps(props, ["popoutMessageConfig"]);
   //check cookie for how many times the site as been loaded
   // const numLoadedCookie: string =  getCookie("numLoadedChat");
   // let numLoaded: number  = parseInt(numLoadedCookie);
@@ -23,7 +25,6 @@ export const Bubble = (props: BubbleProps) => {
 
   //const isMobile =  window?.innerWidth ? (window?.innerWidth < 1000): false;
   const isMobile = isMobileCheck();
-  console.log("is mobile", isMobile);
   const height_calc = isMobile
     ? "calc(min(350px, max(100% - 100px,275px)))"
     : "calc(min(500px, max(100% - 100px,300px)))";
@@ -34,15 +35,11 @@ export const Bubble = (props: BubbleProps) => {
   // grab cookie to check if bot has been closed before
   const cookie_name = `realty-ai-bot-closed-${props.userID}`;
   const count_cookie_name = `realty-ai-bot-open-count-${props.userID}`;
-  console.log("checking:", cookie_name);
 
   const bot_closed_before = getCookie(cookie_name);
-  console.log("bot previously closed", bot_closed_before);
   if (bot_closed_before === "true" && props.stayClosedFlag) {
     defaultOpen = false;
   }
-
-  console.log(props);
 
   //isOpen = false
   const [isBotOpened, setIsBotOpened] = createSignal(defaultOpen);
@@ -66,25 +63,23 @@ export const Bubble = (props: BubbleProps) => {
   };
 
   const timedOpenBot = () => {
-    console.log("Delayed Bot Popup");
-
     if (props.stayClosedFlag && bot_closed_before === "true") {
-      console.log("No Popup - previously closed");
+      // console.log("No Popup - previously closed");
       return;
     }
 
     const maxPopups = props.maxPopups ? props.maxPopups : 0;
     if (maxPopups <= openCount && maxPopups > 0) {
-      console.log("Max Popups", maxPopups);
-      console.log("No Popup - exceeded max popups");
+      // console.log("Max Popups", maxPopups);
+      // console.log("No Popup - exceeded max popups");
       return;
     }
 
-    console.log(props.delayOpenFlag);
+    // console.log(props.delayOpenFlag);
     if (props.delayOpenFlag && !isBotOpened() && !hasClosed()) {
       openBot();
     } else {
-      console.log("No Popup - open and closed already");
+      // console.log("No Popup - open and closed already");
     }
   };
 
@@ -144,16 +139,17 @@ export const Bubble = (props: BubbleProps) => {
       </>
       <BubbleButton
         {...bubbleProps.theme?.button}
+        userID={props.userID}
         toggleBot={toggleBot}
         isBotOpened={isBotOpened()}
-        popoutMessage={{
+        popoutMessageConfig={popoutConfigProps.popoutMessageConfig}
+        popoutMessageTheme={{
           message:
             bubbleProps.theme?.popoutMessage?.message ??
             "Need help? Let's chat!",
-          delay: bubbleProps.theme?.popoutMessage?.delay ?? 2000,
           backgroundColor:
-            bubbleProps.theme?.popoutMessage?.backgroundColor ?? "#f3f3f3",
-          textColor: bubbleProps.theme?.popoutMessage?.textColor ?? "#000000",
+            bubbleProps.theme?.popoutMessage?.backgroundColor ??
+            Config.theme.popoutMessage.defaultBackgroundColor,
         }}
         showAvatar={bubbleProps.theme?.button?.showAvatar ?? true}
         avatarSrc={bubbleProps.theme?.chatWindow?.botMessage?.avatarSrc}
@@ -191,7 +187,6 @@ export const Bubble = (props: BubbleProps) => {
             textInput={bubbleProps.theme?.chatWindow?.textInput}
             botMessage={bubbleProps.theme?.chatWindow?.botMessage}
             userMessage={bubbleProps.theme?.chatWindow?.userMessage}
-            popoutMessage={bubbleProps.theme?.popoutMessage}
             fontSize={bubbleProps.theme?.chatWindow?.fontSize}
             chatflowid={props.chatflowid}
             chatflowConfig={props.chatflowConfig}
