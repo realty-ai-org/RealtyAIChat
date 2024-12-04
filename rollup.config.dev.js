@@ -34,7 +34,7 @@ const indexConfig = {
     }),
     typescript(),
     typescriptPaths({ preserveExtensions: true }),
-    terser({ output: { comments: false } }),
+    // terser({ output: { comments: false } }),
     // serve({
     //   open: true,
     //   verbose: true,
