@@ -7,11 +7,20 @@ export type BubbleParams = {
     theme?: BubbleTheme;
     maxPopups?: number;
     badgeText?: string;
+    popoutMessageConfig: PopoutMessageConfig | undefined;
 };
 export type BubbleTheme = {
     chatWindow?: ChatWindowTheme;
     button?: ButtonTheme;
     popoutMessage?: PopoutMessageTheme;
+};
+export type PopoutMessageConfig = {
+    show?: {
+        desktop?: boolean;
+        mobile?: boolean;
+    };
+    delay?: number;
+    maxPopouts: number | null;
 };
 export type TextInputTheme = {
     backgroundColor?: string;

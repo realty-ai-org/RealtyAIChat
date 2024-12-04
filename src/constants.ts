@@ -19,4 +19,5 @@ export const defaultBotProps: BubbleProps = {
   mobileQuestionFontSize: "10px",
   desktopQuestionFontSize: "12px",
   badgeText: undefined,
+  popoutMessageConfig: undefined,
 };

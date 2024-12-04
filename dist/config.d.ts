@@ -17,6 +17,9 @@ declare const Config: {
                 defaultTextColor: string;
             };
         };
+        popoutMessage: {
+            defaultBackgroundColor: string;
+        };
     };
 };
 export default Config;

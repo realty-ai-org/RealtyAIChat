@@ -14,6 +14,7 @@ declare const chatbot: {
         theme?: Record<string, unknown> | undefined;
         questions?: string[] | undefined;
         maxPopups?: number | undefined;
+        popoutMessageConfig?: import("./features/bubble/types").PopoutMessageConfig | undefined;
         mobileQuestionFontSize?: string | undefined;
         desktopQuestionFontSize?: string | undefined;
         badgeText?: string | undefined;
@@ -35,6 +36,7 @@ declare const chatbot: {
         theme?: Record<string, unknown> | undefined;
         questions?: string[] | undefined;
         maxPopups?: number | undefined;
+        popoutMessageConfig?: import("./features/bubble/types").PopoutMessageConfig | undefined;
         mobileQuestionFontSize?: string | undefined;
         desktopQuestionFontSize?: string | undefined;
         badgeText?: string | undefined;

@@ -5,19 +5,21 @@ import {
   useTransition,
   createEffect,
 } from "solid-js";
-import { isNotDefined } from "@/utils/index";
-import { ButtonTheme } from "../types";
+import {
+  getContrastingColor,
+  getCookie,
+  isNotDefined,
+  setCookie,
+} from "@/utils/index";
+import { ButtonTheme, PopoutMessageConfig, PopoutMessageTheme } from "../types";
 import isMobileCheck from "@/utils/isMobileCheck";
 import { Avatar } from "@/components/avatars/Avatar";
 import Config from "@/config";
 type Props = ButtonTheme & {
+  userID: string;
   isBotOpened: boolean;
-  popoutMessage: {
-    message: string;
-    delay?: number;
-    backgroundColor?: string;
-    textColor?: string;
-  };
+  popoutMessageConfig: PopoutMessageConfig | undefined;
+  popoutMessageTheme: PopoutMessageTheme;
   avatarSrc?: string;
   toggleBot: () => void;
 };
@@ -28,21 +30,60 @@ const defaultBottom = 20;
 const defaultRight = 20;
 
 export const BubbleButton = (props: Props) => {
+  const popout_count_cookie_name = `realty-ai-bot-popout-count-${props.userID}`;
+  const popout_closed_cookie_name = `realty-ai-bot-popout-closed-${props.userID}`;
+
   const [popoutMessageVisible, setPopoutMessageVisible] = createSignal(false);
 
+  var popoutOpenCount = Number(getCookie(popout_count_cookie_name));
+  if (!popoutOpenCount) {
+    popoutOpenCount = 0;
+  }
+
+  var popoutClosed = getCookie(popout_closed_cookie_name) === "true";
+
+  const openPopout = () => {
+    popoutOpenCount++;
+    setCookie(popout_count_cookie_name, popoutOpenCount.toString(), 1 / 48);
+    setPopoutMessageVisible(true);
+  };
+
+  const closePopout = () => {
+    setPopoutMessageVisible(false);
+    popoutOpenCount = props.popoutMessageConfig?.maxPopouts || 0;
+    popoutClosed = true;
+    setCookie(
+      popout_count_cookie_name,
+      (props.popoutMessageConfig?.maxPopouts || 0).toString(),
+      1 / 48
+    );
+    setCookie(popout_closed_cookie_name, "true", 1 / 48);
+  };
+
   onMount(() => {
-    if (props.isBotOpened) {
-      setPopoutMessageVisible(false);
-    } else {
-      setTimeout(() => {
-        if (!props.isBotOpened && !popoutMessageVisible()) {
-          setPopoutMessageVisible(true);
+    if (
+      (isMobileCheck() && props.popoutMessageConfig?.show?.mobile) ||
+      (!isMobileCheck() && props.popoutMessageConfig?.show?.desktop)
+    ) {
+      if (props.isBotOpened) {
+        setPopoutMessageVisible(false);
+      } else if (!popoutClosed) {
+        if (
+          !props.popoutMessageConfig.maxPopouts ||
+          popoutOpenCount < props.popoutMessageConfig.maxPopouts
+        ) {
+          setTimeout(() => {
+            if (!props.isBotOpened && !popoutMessageVisible()) {
+              openPopout();
+            }
+          }, (props.popoutMessageConfig.delay ?? 2) * 1000);
+        } else {
+          // prettier-ignore
+          console.log("%c[REALTY-AI-BOT]", "color: #3B81F6; font-weight: bold;", "MAX POPOUTS REACHED");
         }
-      }, props.popoutMessage.delay ?? 2000);
+      }
     }
   });
-
-  console.log(props.right, props.bottom);
 
   return (
     <div class="relative">
@@ -63,18 +104,36 @@ export const BubbleButton = (props: Props) => {
         >
           <div class="w-60 h-32 flex justify-end items-end">
             <div
-              class="px-4 py-2 ml-2 whitespace-pre-wrap max-w-full chatbot-host-bubble chatbot-welcome-message"
+              class="px-4 py-2 ml-2 whitespace-pre-wrap max-w-full chatbot-host-bubble chatbot-welcome-message relative"
               style={{
                 "background-color":
-                  props.popoutMessage.backgroundColor ??
+                  props.popoutMessageTheme.backgroundColor ??
                   Config.theme.messages.bot.defaultBackgroundColor,
-                color:
-                  props.popoutMessage.textColor ??
-                  Config.theme.messages.bot.defaultTextColor,
+                color: getContrastingColor(
+                  props.popoutMessageTheme.backgroundColor ??
+                    Config.theme.messages.bot.defaultBackgroundColor
+                ),
                 "box-shadow": "0px 0px 10px 0px rgba(0, 0, 0, 0.1)",
               }}
             >
-              {props.popoutMessage.message}
+              {props.popoutMessageTheme.message}
+              <button
+                onClick={closePopout}
+                class="absolute top-[-6px] right-[-6px] h-5 w-5 flex justify-center items-center cursor-pointer hover:scale-125 active:scale-90 transition-transform duration-100"
+                style={{
+                  "z-index": 42424244,
+                  "background-color": getContrastingColor(
+                    props.popoutMessageTheme.backgroundColor ??
+                      Config.theme.messages.bot.defaultBackgroundColor
+                  ),
+                  color:
+                    props.popoutMessageTheme.backgroundColor ??
+                    Config.theme.messages.bot.defaultBackgroundColor,
+                  "border-radius": "50%",
+                }}
+              >
+                <span style="font-size:11pt">&cross;</span>
+              </button>
             </div>
           </div>
         </div>

@@ -192,10 +192,6 @@ export const Bot = (props: BotProps & { class?: string }) => {
       load_id: props.loadID,
       history: messageList,
     };
-    body.history = prepend(
-      { message: "page url: " + window.location.href, type: "apiMessage" },
-      body.history
-    );
     if (props.chatflowConfig) body.overrideConfig = props.chatflowConfig;
 
     if (isChatFlowAvailableToStream())

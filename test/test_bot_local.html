@@ -4,20 +4,44 @@
         <title>RAI Chatbot Test</title>
         <link rel="icon" href="http://localhost:8080/test/images/favicon-dark.png" media="(prefers-color-scheme: light)">
         <link rel="icon" href="http://localhost:8080/test/images/favicon-light.png" media="(prefers-color-scheme: dark)">
+
+        <script id="realty_ai" type="text/javascript" src="http://localhost:8080/dist/web_path_var.js" data-realityaiid="c6a15a67-1274-4f14-af4a-52655664a7cb" async></script>
+
+        <style>
+            body {
+                background-color: #f0f0f0;
+                font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif, sans-serif;
+            }
+        </style>
+
+        <script>
+            function clearCookies() {
+                const cookieDecoded = decodeURIComponent(document.cookie);
+                const cookieArray = cookieDecoded.split("; ");
+                // console.log(`Available cookies:\n${cookieArray.map(c => `${c.split("=")[0].slice(0, -37)} = ${c.split("=")[1]}`).join("\n")}`);
+                let cookieCount = 0;
+                cookieArray.forEach((c) => {
+                    let replacement = c;
+                    if (c.split("=")[1] === "true") replacement = c.replace("=true", "=false");
+                    else if (c.split("=")[1] === "false") replacement = c.replace("=false", "=true");
+                    else replacement = c.replace(/=\d\d*/, "=0");
+                    const date = new Date();
+                    date.setTime(date.getTime());
+                    const expires = "expires=" + date.toUTCString();
+                    if (c.split("=")[1] === replacement.split("=")[1]) return;
+                    document.cookie = `${replacement}; expires=${expires}; path=/`;
+                    cookieCount++;
+                    console.log(`Replaced %c${c.split("=")[0].slice(0, -37)}`, 'color: black; font-weight: bold;', c.split("=")[1], replacement.split("=")[1]);
+                });
+                console.log(`Cleared ${cookieCount} cookies`);
+            }
+        </script>
     </head>
 <body>
-    <!-- <script id = "realty_ai" type="text/javascript" src="http://localhost:8080/dist/web_path_var.js" data-realityaiid="f2249368-ca50-4525-99aa-c3f1e9626eb8"></script> -->
-    <!-- <script id = "realty_ai" type="text/javascript" src="http://localhost:8080/dist/web_path_var.js" data-realityaiid="f2249368-ca50-4525-99aa-c3f1e9626eb8"></script> -->
-    <script id = "realty_ai" type="text/javascript" src="http://localhost:8080/dist/web_path_var.js" data-realityaiid="c6a15a67-1274-4f14-af4a-52655664a7cb"></script>
-    <!-- <script id = "realty_aix_script" src="https://cdn.jsdelivr.net/gh/realty-ai-org/RealtyAIChat@test_js/dist/web_path_var.js">f2249368-ca50-4525-99aa-c3f1e9626eb8</script> -->
-
-    <!-- <script type="module">
-
-        import Chatbot from "https://cdn.jsdelivr.net/gh/realty-ai-org/RealtyAIChat@main/dist/web.js"
-        
-        Chatbot.init({userID:"e970012f-53bf-4635-a4c8-5c421ab04155"})
-        
-        </script> -->
+    <div style="position: fixed; top: 10px; left: 10px; z-index: 9999;">
+        <p style="font-size: 14pt; font-weight: bold; margin-top: 0; margin-bottom: 10px;">Local Debug Commands</p>
+        <button onclick="clearCookies()" style="background-color: white; color: black; border: 1px solid black; font-size: 14pt; border-radius: 5px; padding: 7px 14px;">Clear Cookies</button>
+    </div>
 
 </body>
 

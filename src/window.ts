@@ -2,6 +2,8 @@
 import { sendRequest, getCookie, setCookie } from "@/utils/index";
 import isMobileCheck from "./utils/isMobileCheck";
 import Config from "./config";
+import { PopoutMessageConfig } from "./features/bubble/types";
+import { UserConfig } from "./types";
 
 type BotProps = {
   chatflowid: string;
@@ -18,14 +20,16 @@ type BotProps = {
   theme?: Record<string, unknown>;
   questions?: Array<string>;
   maxPopups?: number;
+  popoutMessageConfig?: PopoutMessageConfig;
   mobileQuestionFontSize?: string;
   desktopQuestionFontSize?: string;
   badgeText?: string;
 };
 
 const fetchAndParseBasicConfig = <T extends BotProps>(props: T) => {
-  console.log(version);
-  return sendRequest<any>({
+  return sendRequest<
+    UserConfig & { errorType?: string; errorMessage?: string; body?: any }
+  >({
     method: "GET",
     url: `${Config.server.userConfigApiUrl}?username=${props.userID}`,
   }).then((response) => {
@@ -37,6 +41,10 @@ const fetchAndParseBasicConfig = <T extends BotProps>(props: T) => {
       throw new Error(response.data.errorMessage || "No response body");
     }
     const config_data = JSON.parse(response.data.body);
+
+    // prettier-ignore
+    console.log("%c[REALTY-AI-BOT]", "color: #3B81F6; font-weight: bold;", "Config Fetched", config_data);
+
     props.theme = config_data?.theme;
     props.chatflowid = config_data?.chatflowid;
     props.apiHost = config_data?.apiHost;
@@ -49,11 +57,16 @@ const fetchAndParseBasicConfig = <T extends BotProps>(props: T) => {
     props.stayClosedFlag = config_data?.stayClosedFlag;
     props.questions = config_data?.questions;
     props.badgeText = config_data?.badgeText;
+    props.popoutMessageConfig = config_data?.popoutMessage;
     return { props, config_data };
   });
 };
 
 const version = "realty-ai-bot-version:2.0";
+
+// prettier-ignore
+console.log("%c[REALTY-AI-BOT]", "color: #3B81F6; font-weight: bold;", version);
+
 export const initFull = (props: BotProps & { id?: string }) => {
   fetchAndParseBasicConfig<BotProps & { id?: string }>(props)
     .then(({ props }) => {
@@ -83,6 +96,7 @@ export const init = async (props: BotProps) => {
       props.desktopQuestionFontSize = config_data?.desktopQuestionFontSize
         ? config_data?.desktopQuestionFontSize
         : "20px";
+
       const no_display = config_data?.no_display;
       const isMobile = isMobileCheck();
 
@@ -92,7 +106,9 @@ export const init = async (props: BotProps) => {
         return;
       }
 
-      console.log("no mobile:", noMobile, "is mobile:", isMobile);
+      // prettier-ignore
+      console.log("%c[REALTY-AI-BOT]", "color: #3B81F6; font-weight: bold;", isMobile ? noMobile ? "Disabled on mobile" : "Platform is mobile" : "Platform is desktop");
+
       if (isMobile && noMobile) {
         return;
       }
