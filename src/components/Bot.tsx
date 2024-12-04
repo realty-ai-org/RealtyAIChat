@@ -198,7 +198,7 @@ export const Bot = (props: BotProps & { class?: string }) => {
       body.socketIOClientId = socketIOClientId();
     let bot_resp_time = new Date().toISOString();
     body.page_url = window.location.href;
-    console.log(body);
+    // console.log(body);
     const result = await sendMessageQuery({
       chatflowid: props.chatflowid,
       apiHost: props.apiHost,
@@ -288,7 +288,7 @@ export const Bot = (props: BotProps & { class?: string }) => {
     const socket = socketIOClient(props.apiHost as string);
 
     socket.on("connect", () => {
-      console.log("connect", socket.id);
+      // console.log("connect", socket.id);
       setSocketIOClientId(socket.id);
     });
 
