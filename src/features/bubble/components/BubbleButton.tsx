@@ -223,6 +223,17 @@ export const BubbleButton = (props: Props) => {
                     alt="Bubble button icon"
                   />
                 </Show>
+                <div
+                  class="live-dot live-dot-animate"
+                  style={{
+                    position: "absolute",
+                    top: "84%",
+                    left: "84%",
+                    transform: "translate(-50%, -50%)",
+                    height: "33%",
+                    width: "33%",
+                  }}
+                />
               </>
             }
           >
