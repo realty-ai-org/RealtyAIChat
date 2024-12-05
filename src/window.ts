@@ -43,8 +43,7 @@ const fetchAndParseBasicConfig = <T extends BotProps>(props: T) => {
     const config_data = JSON.parse(response.data.body);
 
     // prettier-ignore
-    console.log("%c[REALTY-AI-BOT]", "color: #3B81F6; font-weight: bold;", "Config Fetched");
-    // console.log("%c[REALTY-AI-BOT]", "color: #3B81F6; font-weight: bold;", "Config Fetched", config_data);
+    console.log("%c[REALTY-AI-BOT]", "color: #3B81F6; font-weight: bold;", "Config Fetched", config_data);
 
     props.theme = config_data?.theme;
     props.chatflowid = config_data?.chatflowid;
@@ -63,10 +62,10 @@ const fetchAndParseBasicConfig = <T extends BotProps>(props: T) => {
   });
 };
 
-const version = "realty-ai-bot-version:2.0";
+const version = "realty-ai-bot-version:2.0.1";
 
 // prettier-ignore
-console.log("%c[REALTY-AI-BOT]", "color: #3B81F6; font-weight: bold;", version);
+console.info("%c[REALTY-AI-BOT]", "color: #3B81F6; font-weight: bold;", version);
 
 export const initFull = (props: BotProps & { id?: string }) => {
   fetchAndParseBasicConfig<BotProps & { id?: string }>(props)
@@ -108,7 +107,7 @@ export const init = async (props: BotProps) => {
       }
 
       // prettier-ignore
-      console.log("%c[REALTY-AI-BOT]", "color: #3B81F6; font-weight: bold;", isMobile ? noMobile ? "Disabled on mobile" : "Platform is mobile" : "Platform is desktop");
+      console.info("%c[REALTY-AI-BOT]", "color: #3B81F6; font-weight: bold;", isMobile ? noMobile ? "Disabled on mobile" : "Platform is mobile" : "Platform is desktop");
 
       if (isMobile && noMobile) {
         return;

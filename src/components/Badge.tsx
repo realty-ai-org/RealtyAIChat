@@ -22,7 +22,7 @@ export const Badge = (props: Props) => {
           removedNode.id == "lite-badge"
         ) {
           // prettier-ignore
-          console.log("%c[REALTY-AI-BOT]", "color: #3B81F6; font-weight: bold;", "Sorry, you can't remove the brand 😅");
+          console.warn("%c[REALTY-AI-BOT]", "color: #3B81F6; font-weight: bold;", "Sorry, you can't remove the brand 😅");
           props.botContainer?.append(liteBadge);
         }
       });
