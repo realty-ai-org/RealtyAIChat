@@ -11,7 +11,7 @@ injectChatbotInWindow(chatbot);
 const script_id = document.getElementById("realty_ai")?.dataset.realityaiid;
 
 // prettier-ignore
-// console.log("%c[REALTY-AI-BOT]", "color: #3B81F6; font-weight: bold;", script_id);
+console.log("%c[REALTY-AI-BOT]", "color: #3B81F6; font-weight: bold;", script_id);
 
 chatbot.init({
   userID: script_id ? script_id : "",

@@ -79,7 +79,7 @@ export const BubbleButton = (props: Props) => {
           }, (props.popoutMessageConfig.delay ?? 2) * 1000);
         } else {
           // prettier-ignore
-          // console.log("%c[REALTY-AI-BOT]", "color: #3B81F6; font-weight: bold;", "MAX POPOUTS REACHED");
+          console.log("%c[REALTY-AI-BOT]", "color: #3B81F6; font-weight: bold;", "MAX POPOUTS REACHED");
         }
       }
     }

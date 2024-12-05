@@ -1441,6 +1441,9 @@ const BubbleButton = props => {
               openPopout();
             }
           }, (props.popoutMessageConfig.delay ?? 2) * 1000);
+        } else {
+          // prettier-ignore
+          console.log("%c[REALTY-AI-BOT]", "color: #3B81F6; font-weight: bold;", "MAX POPOUTS REACHED");
         }
       }
     }
@@ -3229,7 +3232,7 @@ const Badge = props => {
       mutation.removedNodes.forEach(removedNode => {
         if ("id" in removedNode && liteBadge && removedNode.id == "lite-badge") {
           // prettier-ignore
-          // console.log("%c[REALTY-AI-BOT]", "color: #3B81F6; font-weight: bold;", "Sorry, you can't remove the brand 😅");
+          console.log("%c[REALTY-AI-BOT]", "color: #3B81F6; font-weight: bold;", "Sorry, you can't remove the brand 😅");
           props.botContainer?.append(liteBadge);
         }
       });
@@ -8087,6 +8090,7 @@ const fetchAndParseBasicConfig = props => {
     }
     const config_data = JSON.parse(response.data.body);
     // prettier-ignore
+    console.log("%c[REALTY-AI-BOT]", "color: #3B81F6; font-weight: bold;", "Config Fetched");
     // console.log("%c[REALTY-AI-BOT]", "color: #3B81F6; font-weight: bold;", "Config Fetched", config_data);
     props.theme = config_data?.theme;
     props.chatflowid = config_data?.chatflowid;
@@ -8107,8 +8111,9 @@ const fetchAndParseBasicConfig = props => {
     };
   });
 };
+const version = "realty-ai-bot-version:2.0";
 // prettier-ignore
-// console.log("%c[REALTY-AI-BOT]", "color: #3B81F6; font-weight: bold;", version);
+console.log("%c[REALTY-AI-BOT]", "color: #3B81F6; font-weight: bold;", version);
 const initFull = props => {
   fetchAndParseBasicConfig(props).then(({
     props
@@ -8137,7 +8142,7 @@ const init = async props => {
       return;
     }
     // prettier-ignore
-    // console.log("%c[REALTY-AI-BOT]", "color: #3B81F6; font-weight: bold;", isMobile ? noMobile ? "Disabled on mobile" : "Platform is mobile" : "Platform is desktop");
+    console.log("%c[REALTY-AI-BOT]", "color: #3B81F6; font-weight: bold;", isMobile ? noMobile ? "Disabled on mobile" : "Platform is mobile" : "Platform is desktop");
     if (isMobile && noMobile) {
       return;
     }
@@ -8168,7 +8173,7 @@ injectChatbotInWindow(chatbot);
 // const script_id = document.getElementById("realty_ai")?.getAttribute("data-realityaiid");
 const script_id = document.getElementById("realty_ai")?.dataset.realityaiid;
 // prettier-ignore
-// console.log("%c[REALTY-AI-BOT]", "color: #3B81F6; font-weight: bold;", script_id);
+console.log("%c[REALTY-AI-BOT]", "color: #3B81F6; font-weight: bold;", script_id);
 chatbot.init({
   userID: script_id ? script_id : "",
   chatflowid: "",
