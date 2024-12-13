@@ -116,18 +116,16 @@ export const Bubble = (props: BubbleProps) => {
     }
   });
 
+  const checkStreamAvailability = async () => {
+    const available = await isStreamAvailableQuery({
+      chatflowid: props.chatflowid,
+      apiHost: props.apiHost,
+    });
+    setIsChatFlowAvailableToStream(available);
+    return available;
+  };
+
   onMount(() => {
-    const checkStreamAvailability = async () => {
-      const { data } = await isStreamAvailableQuery({
-        chatflowid: props.chatflowid,
-        apiHost: props.apiHost,
-      });
-
-      if (data) {
-        setIsChatFlowAvailableToStream(data?.isStreaming ?? false);
-      }
-    };
-
     checkStreamAvailability();
   });
 

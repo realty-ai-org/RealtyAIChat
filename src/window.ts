@@ -62,7 +62,7 @@ const fetchAndParseBasicConfig = <T extends BotProps>(props: T) => {
   });
 };
 
-const version = "realty-ai-bot-version:2.0.2";
+const version = "realty-ai-bot-version:2.0.3";
 
 // prettier-ignore
 console.info("%c[REALTY-AI-BOT]", "color: #3B81F6; font-weight: bold;", version);

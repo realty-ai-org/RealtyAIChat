@@ -50,8 +50,13 @@ export const sendLogConvoQuery = (convo: ConvoType) =>
 export const isStreamAvailableQuery = ({
   chatflowid,
   apiHost = "http://localhost:3000",
-}: MessageRequest) =>
-  sendRequest<any>({
+}: MessageRequest): Promise<boolean> =>
+  sendRequest<{ isStreaming: boolean }>({
     method: "GET",
     url: `${apiHost}/api/v1/chatflows-streaming/${chatflowid}`,
-  });
+  })
+    .then((res) => !!res.data?.isStreaming)
+    .catch((error) => {
+      console.error("Error checking stream availability", error);
+      return false;
+    });

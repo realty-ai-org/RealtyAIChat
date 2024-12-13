@@ -8,6 +8,7 @@ const Config = {
   bot: {
     defaultAvatarSrc:
       "https://cdn.jsdelivr.net/gh/realty-ai-org/RealtyAIChat@main/images/default_avatar.png",
+    socketTimeout: 60000,
   },
   theme: {
     messages: {

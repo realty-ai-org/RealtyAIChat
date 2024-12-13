@@ -11,6 +11,7 @@ type Props = {
   defaultValue?: string;
   fontSize?: number;
   onSubmit: (value: string) => void;
+  onChange?: (value: string) => void;
 };
 
 const defaultBackgroundColor = "#ffffff";
@@ -20,7 +21,10 @@ export const TextInput = (props: Props) => {
   const [inputValue, setInputValue] = createSignal(props.defaultValue ?? "");
   let inputRef: HTMLInputElement | HTMLTextAreaElement | undefined;
 
-  const handleInput = (inputValue: string) => setInputValue(inputValue);
+  const handleInput = (inputValue: string) => {
+    setInputValue(inputValue);
+    props.onChange?.(inputValue);
+  };
 
   const checkIfInputIsValid = () =>
     inputValue() !== "" && inputRef?.reportValidity();

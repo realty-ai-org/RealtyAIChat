@@ -5,6 +5,7 @@ declare const Config: {
     };
     bot: {
         defaultAvatarSrc: string;
+        socketTimeout: number;
     };
     theme: {
         messages: {

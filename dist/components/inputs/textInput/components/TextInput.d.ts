@@ -6,6 +6,7 @@ type Props = {
     defaultValue?: string;
     fontSize?: number;
     onSubmit: (value: string) => void;
+    onChange?: (value: string) => void;
 };
 export declare const TextInput: (props: Props) => import("solid-js").JSX.Element;
 export {};

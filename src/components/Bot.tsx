@@ -18,9 +18,10 @@ import {
   UserMessageTheme,
 } from "@/features/bubble/types";
 import { Badge } from "./Badge";
-import socketIOClient from "socket.io-client";
+import socketIOClient, { Socket } from "socket.io-client";
 import { Popup } from "@/features/popup";
 import { QuestionButton } from "./bubbles/QuestionButton";
+import Config from "@/config";
 type messageType = "apiMessage" | "userMessage" | "usermessagewaiting";
 
 export type MessageType = {
@@ -66,6 +67,9 @@ export const Bot = (props: BotProps & { class?: string }) => {
   const [sourcePopupOpen, setSourcePopupOpen] = createSignal(false);
   const [sourcePopupSrc, setSourcePopupSrc] = createSignal({});
   const [questionClicked, setQuestionClicked] = createSignal(false);
+  const [socket, setSocket] = createSignal<Socket | null>(null);
+
+  let socketTimeout: NodeJS.Timeout | null = null;
 
   const [messages, setMessages] = createSignal<MessageType[]>(
     [
@@ -108,6 +112,7 @@ export const Bot = (props: BotProps & { class?: string }) => {
   };
 
   const updateLastMessage = (text: string) => {
+    resetSocketTimeout();
     setMessages((data) => {
       const updated = data.map((item, i) => {
         if (
@@ -123,6 +128,7 @@ export const Bot = (props: BotProps & { class?: string }) => {
     });
   };
   const updateFullMessage = (text: string, id: string) => {
+    resetSocketTimeout();
     setMessages((data) => {
       const updated = data.map((item, i) => {
         if (item.type === "apiMessage" && item.id === id) {
@@ -135,6 +141,7 @@ export const Bot = (props: BotProps & { class?: string }) => {
   };
 
   const updateLastMessageSourceDocuments = (sourceDocuments: any) => {
+    resetSocketTimeout();
     setMessages((data) => {
       const updated = data.map((item, i) => {
         if (i === data.length - 1) {
@@ -167,100 +174,109 @@ export const Bot = (props: BotProps & { class?: string }) => {
 
   // Handle form submission
   const handleSubmit = async (value: string) => {
-    setQuestionClicked(true);
-    setUserInput(value);
+    try {
+      setQuestionClicked(true);
+      setUserInput(value);
 
-    if (value.trim() === "") {
-      return;
-    }
-    let message_send_time = new Date().toISOString();
-
-    setLoading(true);
-    scrollToBottom();
-    // Send user question and history to API
-    const welcomeMessage = props.welcomeMessage ?? defaultWelcomeMessage;
-    const messageList = messages().filter((msg) => !msg?.streamable);
-    const message_id = String(Math.random());
-    setMessages((prevMessages) => [
-      ...prevMessages,
-      { message: value, type: "userMessage" },
-      { message: "", type: "apiMessage", streamable: true, id: message_id },
-    ]);
-
-    const body: IncomingInput = {
-      question: value,
-      load_id: props.loadID,
-      history: messageList,
-    };
-    if (props.chatflowConfig) body.overrideConfig = props.chatflowConfig;
-
-    if (isChatFlowAvailableToStream())
-      body.socketIOClientId = socketIOClientId();
-    let bot_resp_time = new Date().toISOString();
-    body.page_url = window.location.href;
-    // console.log(body);
-    const result = await sendMessageQuery({
-      chatflowid: props.chatflowid,
-      apiHost: props.apiHost,
-      body,
-    });
-    var text = "";
-    if (typeof result.data === "object" && "text" in result.data) {
-      text = result.data.text;
-    } else {
-      text = result.data;
-    }
-
-    const convo_message: ConvoType = {
-      messages: [
-        {
-          text: value,
-          type: "user",
-          timestamp: message_send_time,
-        },
-        {
-          text: text,
-          type: "bot",
-          timestamp: bot_resp_time,
-        },
-      ],
-      load_id: props.loadID,
-      realtor_id: props.userID,
-    };
-
-    sendLogConvoQuery(convo_message);
-    if (result.data) {
-      const data = handleVectaraMetadata(result.data);
-      if (typeof data === "object" && data.text && data.sourceDocuments) {
-        if (!isChatFlowAvailableToStream()) {
-          setMessages((prevMessages) => [
-            ...prevMessages,
-            {
-              message: data.text,
-              sourceDocuments: data.sourceDocuments,
-              type: "apiMessage",
-            },
-          ]);
-        }
-      } else {
-        updateFullMessage(text, message_id);
-        //if (!isChatFlowAvailableToStream()) setMessages((prevMessages) => [...prevMessages, { message: data, type: 'apiMessage' }])
+      if (value.trim() === "") {
+        return;
       }
-      setLoading(false);
-      setUserInput("");
+      let message_send_time = new Date().toISOString();
+
+      setLoading(true);
       scrollToBottom();
-    }
-    if (result.error) {
-      const error = result.error;
+      // Send user question and history to API
+      const welcomeMessage = props.welcomeMessage ?? defaultWelcomeMessage;
+      const messageList = messages().filter((msg) => !msg?.streamable);
+      const message_id = String(Math.random());
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        { message: value, type: "userMessage" },
+        { message: "", type: "apiMessage", streamable: true, id: message_id },
+      ]);
+
+      if (!socket()) {
+        await initializeSocket();
+      }
+
+      const body: IncomingInput = {
+        question: value,
+        load_id: props.loadID,
+        history: messageList,
+      };
+      if (props.chatflowConfig) body.overrideConfig = props.chatflowConfig;
+
+      if (isChatFlowAvailableToStream())
+        body.socketIOClientId = socketIOClientId();
+      let bot_resp_time = new Date().toISOString();
+      body.page_url = window.location.href;
+      // console.log(body);
+      const result = await sendMessageQuery({
+        chatflowid: props.chatflowid,
+        apiHost: props.apiHost,
+        body,
+      });
+      var text = "";
+      if (typeof result.data === "object" && "text" in result.data) {
+        text = result.data.text;
+      } else {
+        text = result.data;
+      }
+
+      const convo_message: ConvoType = {
+        messages: [
+          {
+            text: value,
+            type: "user",
+            timestamp: message_send_time,
+          },
+          {
+            text: text,
+            type: "bot",
+            timestamp: bot_resp_time,
+          },
+        ],
+        load_id: props.loadID,
+        realtor_id: props.userID,
+      };
+
+      sendLogConvoQuery(convo_message);
+      if (result.data) {
+        const data = handleVectaraMetadata(result.data);
+        if (typeof data === "object" && data.text && data.sourceDocuments) {
+          if (!isChatFlowAvailableToStream()) {
+            setMessages((prevMessages) => [
+              ...prevMessages,
+              {
+                message: data.text,
+                sourceDocuments: data.sourceDocuments,
+                type: "apiMessage",
+              },
+            ]);
+          }
+        } else {
+          updateFullMessage(text, message_id);
+          //if (!isChatFlowAvailableToStream()) setMessages((prevMessages) => [...prevMessages, { message: data, type: 'apiMessage' }])
+        }
+        setLoading(false);
+        setUserInput("");
+        scrollToBottom();
+      }
+      if (result.error) {
+        const error = result.error;
+        console.error(error);
+        const err: any = error;
+        const errorData =
+          typeof err === "string"
+            ? err
+            : err.response.data ||
+              `${err.response.status}: ${err.response.statusText}`;
+        handleError(errorData);
+        return;
+      }
+    } catch (error) {
       console.error(error);
-      const err: any = error;
-      const errorData =
-        typeof err === "string"
-          ? err
-          : err.response.data ||
-            `${err.response.status}: ${err.response.statusText}`;
-      handleError(errorData);
-      return;
+      handleError();
     }
   };
 
@@ -274,33 +290,64 @@ export const Bot = (props: BotProps & { class?: string }) => {
       botContainer.style.fontSize = `${props.fontSize}px`;
   });
 
-  // eslint-disable-next-line solid/reactivity
-  createEffect(async () => {
-    const { data } = await isStreamAvailableQuery({
+  const checkStreamAvailability = async () => {
+    const available = await isStreamAvailableQuery({
       chatflowid: props.chatflowid,
       apiHost: props.apiHost,
     });
+    setIsChatFlowAvailableToStream(available);
+    return available;
+  };
 
-    if (data) {
-      setIsChatFlowAvailableToStream(data?.isStreaming ?? false);
-    }
+  const initializeSocket = async () => {
+    if (socket()) return;
+    // prettier-ignore
+    console.log("%c[SOCKET]", "color: #F59302; font-weight: bold;", "Initializing");
 
-    const socket = socketIOClient(props.apiHost as string);
+    const s = socketIOClient(props.apiHost as string);
 
-    socket.on("connect", () => {
-      // console.log("connect", socket.id);
-      setSocketIOClientId(socket.id);
+    s.on("connect", () => {
+      setSocketIOClientId(s.id);
+
+      // prettier-ignore
+      console.log("%c[SOCKET]", "color: #F59302; font-weight: bold;", "Connected", s.id);
     });
 
-    socket.on("start", () => {
+    s.on("start", () => {
       // setMessages((prevMessages) => [...prevMessages, { message: '', type: 'apiMessage' }])
+      // prettier-ignore
+      console.log("%c[SOCKET]", "color: #F59302; font-weight: bold;", "Started");
     });
 
-    socket.on("sourceDocuments", updateLastMessageSourceDocuments);
+    s.on("sourceDocuments", updateLastMessageSourceDocuments);
 
-    socket.on("token", updateLastMessage);
+    s.on("token", updateLastMessage);
 
-    // eslint-disable-next-line solid/reactivity
+    s.on("disconnect", () => {
+      // prettier-ignore
+      console.log("%c[SOCKET]", "color: #F59302; font-weight: bold;", "Disconnected");
+      setSocketIOClientId("");
+      setSocket(null);
+    });
+
+    setSocket(s);
+
+    // prettier-ignore
+    console.log("%c[SOCKET]", "color: #F59302; font-weight: bold;", "Configured");
+  };
+
+  const cleanupSocket = () => {
+    const s = socket();
+    if (s) {
+      s.disconnect();
+      setSocket(null);
+      setSocketIOClientId("");
+    }
+  };
+
+  createEffect(() => {
+    checkStreamAvailability();
+
     return () => {
       setUserInput("");
       setLoading(false);
@@ -310,12 +357,23 @@ export const Bot = (props: BotProps & { class?: string }) => {
           type: "apiMessage",
         },
       ]);
-      if (socket) {
-        socket.disconnect();
-        setSocketIOClientId("");
-      }
+      cleanupSocket();
     };
   });
+
+  const resetSocketTimeout = () => {
+    if (socketTimeout) clearTimeout(socketTimeout);
+    socketTimeout = setTimeout(() => {
+      // prettier-ignore
+      console.log("%c[SOCKET]", "color: #F59302; font-weight: bold;", "Closing due to inactivity");
+      cleanupSocket();
+    }, Config.bot.socketTimeout);
+  };
+
+  const handleTextInputChange = () => {
+    resetSocketTimeout();
+    initializeSocket();
+  };
 
   const isValidURL = (url: string): URL | undefined => {
     try {
@@ -490,6 +548,7 @@ export const Bot = (props: BotProps & { class?: string }) => {
             fontSize={props.fontSize}
             defaultValue={userInput()}
             onSubmit={handleSubmit}
+            onChange={handleTextInputChange}
           />
         </div>
 
