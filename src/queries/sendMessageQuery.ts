@@ -47,16 +47,27 @@ export const sendLogConvoQuery = (convo: ConvoType) =>
     body: convo,
   });
 
-export const isStreamAvailableQuery = ({
-  chatflowid,
-  apiHost = "http://localhost:3000",
-}: MessageRequest): Promise<boolean> =>
-  sendRequest<{ isStreaming: boolean }>({
+// export const isStreamAvailableQuery = ({
+//   chatflowid,
+//   apiHost = "http://localhost:3000",
+// }: MessageRequest): Promise<boolean> =>
+//   sendRequest<{ isStreaming: boolean }>({
+//     method: "GET",
+//     url: `${apiHost}/api/v1/chatflows-streaming/${chatflowid}`,
+//   })
+//     .then((res) => !!res.data?.isStreaming)
+//     .catch((error) => {
+//       console.error("Error checking stream availability", error);
+//       return false;
+//     });
+
+export const checkChatEngineHeartbeat = (apiHost: string): Promise<boolean> =>
+  sendRequest<{ is_alive: boolean }>({
     method: "GET",
-    url: `${apiHost}/api/v1/chatflows-streaming/${chatflowid}`,
+    url: `${apiHost}/api/v1/heartbeat`,
   })
-    .then((res) => !!res.data?.isStreaming)
+    .then((res) => !!res.data?.is_alive)
     .catch((error) => {
-      console.error("Error checking stream availability", error);
+      console.error("Error checking chat engine heartbeat", error);
       return false;
     });
