@@ -30,5 +30,5 @@ export declare const sendLogConvoQuery: (convo: ConvoType) => Promise<{
     data?: any;
     error?: Error | undefined;
 }>;
-export declare const isStreamAvailableQuery: ({ chatflowid, apiHost, }: MessageRequest) => Promise<boolean>;
+export declare const checkChatEngineHeartbeat: (apiHost: string) => Promise<boolean>;
 //# sourceMappingURL=sendMessageQuery.d.ts.map

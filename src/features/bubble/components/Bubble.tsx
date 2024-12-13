@@ -11,8 +11,8 @@ import { BubbleParams } from "../types";
 import { Bot, BotProps } from "../../../components/Bot";
 import { getCookie, setCookie } from "@/utils/index";
 import isMobileCheck from "@/utils/isMobileCheck";
-import { isStreamAvailableQuery } from "@/queries/sendMessageQuery";
 import Config from "@/config";
+import { checkChatEngineHeartbeat } from "@/queries/sendMessageQuery";
 export type BubbleProps = BotProps & BubbleParams;
 
 export const Bubble = (props: BubbleProps) => {
@@ -117,10 +117,7 @@ export const Bubble = (props: BubbleProps) => {
   });
 
   const checkStreamAvailability = async () => {
-    const available = await isStreamAvailableQuery({
-      chatflowid: props.chatflowid,
-      apiHost: props.apiHost,
-    });
+    const available = await checkChatEngineHeartbeat(props.apiHost || "");
     setIsChatFlowAvailableToStream(available);
     return available;
   };

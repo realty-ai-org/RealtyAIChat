@@ -1,10 +1,10 @@
 import { createSignal, createEffect, For, onMount, Show } from "solid-js";
 import {
   sendMessageQuery,
-  isStreamAvailableQuery,
   IncomingInput,
   ConvoType,
   sendLogConvoQuery,
+  checkChatEngineHeartbeat,
 } from "@/queries/sendMessageQuery";
 import { TextInput } from "./inputs/textInput";
 import { GuestBubble } from "./bubbles/GuestBubble";
@@ -18,7 +18,7 @@ import {
   UserMessageTheme,
 } from "@/features/bubble/types";
 import { Badge } from "./Badge";
-import socketIOClient, { Socket } from "socket.io-client";
+// import socketIOClient, { Socket } from "socket.io-client";
 import { Popup } from "@/features/popup";
 import { QuestionButton } from "./bubbles/QuestionButton";
 import Config from "@/config";
@@ -67,9 +67,9 @@ export const Bot = (props: BotProps & { class?: string }) => {
   const [sourcePopupOpen, setSourcePopupOpen] = createSignal(false);
   const [sourcePopupSrc, setSourcePopupSrc] = createSignal({});
   const [questionClicked, setQuestionClicked] = createSignal(false);
-  const [socket, setSocket] = createSignal<Socket | null>(null);
+  // const [socket, setSocket] = createSignal<Socket | null>(null);
 
-  let socketTimeout: NodeJS.Timeout | null = null;
+  // let socketTimeout: NodeJS.Timeout | null = null;
 
   const [messages, setMessages] = createSignal<MessageType[]>(
     [
@@ -80,9 +80,8 @@ export const Bot = (props: BotProps & { class?: string }) => {
     ],
     { equals: false }
   );
-  const [socketIOClientId, setSocketIOClientId] = createSignal("");
-  const [isChatFlowAvailableToStream, setIsChatFlowAvailableToStream] =
-    createSignal(false);
+  // const [socketIOClientId, setSocketIOClientId] = createSignal("");
+  const [chatEngineAlive, setChatEngineAlive] = createSignal(false);
 
   const convo_message: ConvoType = {
     messages: [
@@ -112,7 +111,7 @@ export const Bot = (props: BotProps & { class?: string }) => {
   };
 
   const updateLastMessage = (text: string) => {
-    resetSocketTimeout();
+    // resetSocketTimeout();
     setMessages((data) => {
       const updated = data.map((item, i) => {
         if (
@@ -128,7 +127,7 @@ export const Bot = (props: BotProps & { class?: string }) => {
     });
   };
   const updateFullMessage = (text: string, id: string) => {
-    resetSocketTimeout();
+    // resetSocketTimeout();
     setMessages((data) => {
       const updated = data.map((item, i) => {
         if (item.type === "apiMessage" && item.id === id) {
@@ -141,7 +140,7 @@ export const Bot = (props: BotProps & { class?: string }) => {
   };
 
   const updateLastMessageSourceDocuments = (sourceDocuments: any) => {
-    resetSocketTimeout();
+    // resetSocketTimeout();
     setMessages((data) => {
       const updated = data.map((item, i) => {
         if (i === data.length - 1) {
@@ -195,9 +194,9 @@ export const Bot = (props: BotProps & { class?: string }) => {
         { message: "", type: "apiMessage", streamable: true, id: message_id },
       ]);
 
-      if (!socket()) {
-        await initializeSocket();
-      }
+      // if (!socket()) {
+      //   await initializeSocket();
+      // }
 
       const body: IncomingInput = {
         question: value,
@@ -206,8 +205,8 @@ export const Bot = (props: BotProps & { class?: string }) => {
       };
       if (props.chatflowConfig) body.overrideConfig = props.chatflowConfig;
 
-      if (isChatFlowAvailableToStream())
-        body.socketIOClientId = socketIOClientId();
+      // if (isChatFlowAvailableToStream())
+      //   body.socketIOClientId = socketIOClientId();
       let bot_resp_time = new Date().toISOString();
       body.page_url = window.location.href;
       // console.log(body);
@@ -244,7 +243,7 @@ export const Bot = (props: BotProps & { class?: string }) => {
       if (result.data) {
         const data = handleVectaraMetadata(result.data);
         if (typeof data === "object" && data.text && data.sourceDocuments) {
-          if (!isChatFlowAvailableToStream()) {
+          if (!chatEngineAlive()) {
             setMessages((prevMessages) => [
               ...prevMessages,
               {
@@ -291,59 +290,56 @@ export const Bot = (props: BotProps & { class?: string }) => {
   });
 
   const checkStreamAvailability = async () => {
-    const available = await isStreamAvailableQuery({
-      chatflowid: props.chatflowid,
-      apiHost: props.apiHost,
-    });
-    setIsChatFlowAvailableToStream(available);
+    const available = await checkChatEngineHeartbeat(props.apiHost || "");
+    setChatEngineAlive(available);
     return available;
   };
 
-  const initializeSocket = async () => {
-    if (socket()) return;
-    // prettier-ignore
-    console.log("%c[SOCKET]", "color: #F59302; font-weight: bold;", "Initializing");
+  // const initializeSocket = async () => {
+  //   if (socket()) return;
+  //   // prettier-ignore
+  //   console.log("%c[SOCKET]", "color: #F59302; font-weight: bold;", "Initializing");
 
-    const s = socketIOClient(props.apiHost as string);
+  //   const s = socketIOClient(props.apiHost as string);
 
-    s.on("connect", () => {
-      setSocketIOClientId(s.id);
+  //   s.on("connect", () => {
+  //     setSocketIOClientId(s.id);
 
-      // prettier-ignore
-      console.log("%c[SOCKET]", "color: #F59302; font-weight: bold;", "Connected", s.id);
-    });
+  //     // prettier-ignore
+  //     console.log("%c[SOCKET]", "color: #F59302; font-weight: bold;", "Connected", s.id);
+  //   });
 
-    s.on("start", () => {
-      // setMessages((prevMessages) => [...prevMessages, { message: '', type: 'apiMessage' }])
-      // prettier-ignore
-      console.log("%c[SOCKET]", "color: #F59302; font-weight: bold;", "Started");
-    });
+  //   s.on("start", () => {
+  //     // setMessages((prevMessages) => [...prevMessages, { message: '', type: 'apiMessage' }])
+  //     // prettier-ignore
+  //     console.log("%c[SOCKET]", "color: #F59302; font-weight: bold;", "Started");
+  //   });
 
-    s.on("sourceDocuments", updateLastMessageSourceDocuments);
+  //   s.on("sourceDocuments", updateLastMessageSourceDocuments);
 
-    s.on("token", updateLastMessage);
+  //   s.on("token", updateLastMessage);
 
-    s.on("disconnect", () => {
-      // prettier-ignore
-      console.log("%c[SOCKET]", "color: #F59302; font-weight: bold;", "Disconnected");
-      setSocketIOClientId("");
-      setSocket(null);
-    });
+  //   s.on("disconnect", () => {
+  //     // prettier-ignore
+  //     console.log("%c[SOCKET]", "color: #F59302; font-weight: bold;", "Disconnected");
+  //     setSocketIOClientId("");
+  //     setSocket(null);
+  //   });
 
-    setSocket(s);
+  //   setSocket(s);
 
-    // prettier-ignore
-    console.log("%c[SOCKET]", "color: #F59302; font-weight: bold;", "Configured");
-  };
+  //   // prettier-ignore
+  //   console.log("%c[SOCKET]", "color: #F59302; font-weight: bold;", "Configured");
+  // };
 
-  const cleanupSocket = () => {
-    const s = socket();
-    if (s) {
-      s.disconnect();
-      setSocket(null);
-      setSocketIOClientId("");
-    }
-  };
+  // const cleanupSocket = () => {
+  //   const s = socket();
+  //   if (s) {
+  //     s.disconnect();
+  //     setSocket(null);
+  //     setSocketIOClientId("");
+  //   }
+  // };
 
   createEffect(() => {
     checkStreamAvailability();
@@ -357,22 +353,22 @@ export const Bot = (props: BotProps & { class?: string }) => {
           type: "apiMessage",
         },
       ]);
-      cleanupSocket();
+      // cleanupSocket();
     };
   });
 
-  const resetSocketTimeout = () => {
-    if (socketTimeout) clearTimeout(socketTimeout);
-    socketTimeout = setTimeout(() => {
-      // prettier-ignore
-      console.log("%c[SOCKET]", "color: #F59302; font-weight: bold;", "Closing due to inactivity");
-      cleanupSocket();
-    }, Config.bot.socketTimeout);
-  };
+  // const resetSocketTimeout = () => {
+  //   if (socketTimeout) clearTimeout(socketTimeout);
+  //   socketTimeout = setTimeout(() => {
+  //     // prettier-ignore
+  //     console.log("%c[SOCKET]", "color: #F59302; font-weight: bold;", "Closing due to inactivity");
+  //     cleanupSocket();
+  //   }, Config.bot.socketTimeout);
+  // };
 
   const handleTextInputChange = () => {
-    resetSocketTimeout();
-    initializeSocket();
+    // resetSocketTimeout();
+    // initializeSocket();
   };
 
   const isValidURL = (url: string): URL | undefined => {
