@@ -62,12 +62,13 @@ export const sendLogConvoQuery = (convo: ConvoType) =>
 //     });
 
 export const checkChatEngineHeartbeat = (apiHost: string): Promise<boolean> =>
-  sendRequest<{ is_alive: boolean }>({
-    method: "GET",
-    url: `${apiHost}/api/v1/heartbeat`,
-  })
-    .then((res) => !!res.data?.is_alive)
-    .catch((error) => {
-      console.error("Error checking chat engine heartbeat", error);
-      return false;
-    });
+  Promise.resolve(true);
+// sendRequest<{ is_alive: boolean }>({
+//   method: "GET",
+//   url: `${apiHost}/api/v1/heartbeat`,
+// })
+//   .then((res) => !!res.data?.is_alive)
+//   .catch((error) => {
+//     console.error("Error checking chat engine heartbeat", error);
+//     return false;
+//   });

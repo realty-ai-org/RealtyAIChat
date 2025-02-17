@@ -27,6 +27,28 @@ type BotProps = {
 };
 
 const fetchAndParseBasicConfig = <T extends BotProps>(props: T) => {
+  return Promise.resolve({
+    props: {
+      popoutMessage: {
+        show: {
+          desktop: true,
+          mobile: true,
+        },
+        delay: 200,
+        maxPopouts: null,
+      },
+      theme: {
+        button: {
+          position: "left",
+        },
+        popoutMessage: {
+          message: "Welcome Joe",
+          backgroundColor: "white",
+        },
+      },
+    } as any,
+    config_data: {} as Object,
+  });
   return sendRequest<
     UserConfig & { errorType?: string; errorMessage?: string; body?: any }
   >({

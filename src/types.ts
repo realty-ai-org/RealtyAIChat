@@ -17,6 +17,7 @@ export type UserConfig = {
     button: {
       backgroundColor: string;
       showAvatar: boolean;
+      position: "left" | "right";
     };
     chatWindow: {
       welcomeMessage: string;
