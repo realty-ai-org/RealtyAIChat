@@ -6,6 +6,7 @@ type Props = ButtonTheme & {
     popoutMessageTheme: PopoutMessageTheme;
     avatarSrc?: string;
     toggleBot: () => void;
+    liveIconPosition?: "left" | "right";
 };
 export declare const BubbleButton: (props: Props) => import("solid-js").JSX.Element;
 export {};

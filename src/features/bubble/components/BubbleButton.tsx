@@ -22,6 +22,7 @@ type Props = ButtonTheme & {
   popoutMessageTheme: PopoutMessageTheme;
   avatarSrc?: string;
   toggleBot: () => void;
+  liveIconPosition?: "left" | "right";
 };
 
 const defaultButtonColor = "#3B81F6";
@@ -262,6 +263,7 @@ export const BubbleButton = (props: Props) => {
               liveIcon="dot"
               isLive
               animate
+              liveIconPosition={props.liveIconPosition}
             />
           </Show>
         </Show>

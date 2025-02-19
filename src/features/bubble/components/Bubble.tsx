@@ -149,6 +149,7 @@ export const Bubble = (props: BubbleProps) => {
         position={bubbleProps.theme?.button?.position || "right"}
         showAvatar={bubbleProps.theme?.button?.showAvatar ?? true}
         avatarSrc={bubbleProps.theme?.chatWindow?.botMessage?.avatarSrc}
+        liveIconPosition={bubbleProps.theme?.button?.position || "right"}
       />
       <div
         part="bot" //ADD CHANGE TO HIGH LINE BASED ON IS MOBILE
