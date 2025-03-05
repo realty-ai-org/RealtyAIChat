@@ -146,8 +146,10 @@ export const Bubble = (props: BubbleProps) => {
             bubbleProps.theme?.popoutMessage?.backgroundColor ??
             Config.theme.popoutMessage.defaultBackgroundColor,
         }}
+        position={bubbleProps.theme?.button?.position || "right"}
         showAvatar={bubbleProps.theme?.button?.showAvatar ?? true}
         avatarSrc={bubbleProps.theme?.chatWindow?.botMessage?.avatarSrc}
+        liveIconPosition={bubbleProps.theme?.button?.position || "right"}
       />
       <div
         part="bot" //ADD CHANGE TO HIGH LINE BASED ON IS MOBILE
@@ -165,9 +167,14 @@ export const Bubble = (props: BubbleProps) => {
           "z-index": 42424242,
         }}
         class={
-          `fixed sm:right-5 rounded-lg w-full sm:w-[400px] max-h-[704px] overflow-hidden` +
+          `fixed rounded-lg w-full sm:w-[400px] max-h-[704px] overflow-hidden` +
           (isBotOpened() ? " opacity-1" : " opacity-0 pointer-events-none") +
-          (props.theme?.button?.size === "large" ? " bottom-28" : " bottom-24")
+          (props.theme?.button?.size === "large"
+            ? " bottom-28"
+            : " bottom-24") +
+          (props.theme?.button?.position === "right"
+            ? " sm:right-5"
+            : " sm:left-5")
         }
       >
         <Show when={isBotStarted()}>
