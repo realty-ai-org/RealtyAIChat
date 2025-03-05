@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>RAI Chatbot Demo</title>
+        <link rel="icon" href="https://cdn.realty-ai.com/chat/images/demo-chatbot-favicon-dark.png" media="(prefers-color-scheme: light)">
+        <link rel="icon" href="https://cdn.realty-ai.com/chat/images/demo-chatbot-favicon-light.png" media="(prefers-color-scheme: dark)">
+
+        <script type="module">
+
+            import Chatbot from "https://cdn.jsdelivr.net/gh/realty-ai-org/RealtyAIChat@main/dist/web.js"
+
+            const userIDCookieName = `${window.location.hostname}-userID`;
+
+            function clearCookies() {
+                const cookieDecoded = decodeURIComponent(document.cookie);
+                const cookieArray = cookieDecoded.split("; ");
+                let cookieCount = 0;
+                cookieArray.forEach((c) => {
+                    let replacement = c;
+                    if (c.split("=")[1] === "true") replacement = c.replace("=true", "=false");
+                    else if (c.split("=")[1] === "false") replacement = c.replace("=false", "=true");
+                    else replacement = c.replace(/=\d\d*/, "=0");
+                    const date = new Date();
+                    date.setTime(date.getTime());
+                    const expires = "expires=" + date.toUTCString();
+                    if (c.split("=")[1] === replacement.split("=")[1]) return;
+                    document.cookie = `${replacement}; expires=${expires}; path=/`;
+                    cookieCount++;
+                    console.log("%c[REALTY-AI-DEMO]", "color: #813BF6; font-weight: bold;", `Replaced %c${c.split("=")[0].slice(0, -37)}`, 'color: black; font-weight: bold;', c.split("=")[1], replacement.split("=")[1]);
+                });
+                console.log("%c[REALTY-AI-DEMO]", "color: #813BF6; font-weight: bold;", `Cleared ${cookieCount} cookies`);
+            }
+
+            function getUserIDFromQueryParams() {
+                const urlParams = new URLSearchParams(window.location.search);
+                return urlParams.get('userID');
+            }
+            
+            function getUserIDFromCookies() {
+                const cookies = document.cookie.split(';');
+                for (let cookie of cookies) {
+                    const [name, value] = cookie.trim().split('=');
+                    if (name === userIDCookieName) {
+                        return value;
+                    }
+                }
+                return null;
+            }
+            
+            function saveUserIDToCookies(userID) {
+                // Save for 30 days
+                const expiryDate = new Date();
+                expiryDate.setDate(expiryDate.getDate() + 30);
+                document.cookie = `${userIDCookieName}=${userID}; expires=${expiryDate.toUTCString()}; path=/`;
+                console.log("%c[REALTY-AI-DEMO]", "color: #813BF6; font-weight: bold;", "Saved userID to cookies");
+            }
+
+            function showUserIDRequiredAlert() {
+                const overlay = document.createElement('div');
+                overlay.className = 'custom-alert-overlay';
+                
+                const alertBox = document.createElement('div');
+                alertBox.className = 'custom-alert-box';
+                
+                const content = document.createElement('div');
+                content.className = 'custom-alert-content';
+                const urlParams = new URLSearchParams(window.location.search);
+                urlParams.set('userID', '1234567890');
+                const url = `${window.location.origin}${window.location.pathname}?${urlParams.toString()}`;
+                content.innerHTML = `<b>userID is required</b><br><br>Example:<br><a href="${url}">${url}</a>`;
+                
+                alertBox.appendChild(content);
+                overlay.appendChild(alertBox);
+                
+                document.body.appendChild(overlay);
+            }
+
+            const userID = getUserIDFromQueryParams();
+            if (!userID || userID.trim() === '') {
+                showUserIDRequiredAlert();
+                throw new Error("userID is required");
+            } else {
+                console.log("%c[REALTY-AI-DEMO]", "color: #813BF6; font-weight: bold;", `Initializing Chatbot with userID: ${userID}`);
+                
+                const savedUserID = getUserIDFromCookies();
+                if (savedUserID && savedUserID !== userID) {
+                    clearCookies();
+                    console.log("%c[REALTY-AI-DEMO]", "color: #813BF6; font-weight: bold;", 'Cleared cookies due to userID mismatch');
+                }
+                
+                // Save valid userID to cookies
+                saveUserIDToCookies(userID);
+                Chatbot.init({userID})
+            }
+            
+            </script>
+    
+        <style>
+            body {
+                background-color: #f0f0f0;
+                font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif, sans-serif;
+            }
+
+            /* Custom Alert Styles */
+            .custom-alert-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.5);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 10000;
+            }
+            
+            .custom-alert-box {
+                background-color: white;
+                padding: 20px;
+                border-radius: 8px;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+                max-width: 400px;
+                width: 80%;
+                text-align: center;
+            }
+            
+            .custom-alert-content {
+                margin-bottom: 20px;
+                line-height: 1.5;
+            }
+            
+            .custom-alert-button {
+                background-color: #4285f4;
+                color: white;
+                border: none;
+                padding: 8px 16px;
+                border-radius: 4px;
+                cursor: pointer;
+                font-weight: bold;
+            }
+            
+            .custom-alert-button:hover {
+                background-color: #3367d6;
+            }
+        </style>
+    </head>
+<body>
+</body>
+</html>
