@@ -5,5 +5,6 @@ export declare const Avatar: (props: {
     liveIcon?: "border" | "dot";
     animate?: boolean;
     style?: JSX.CSSProperties | undefined;
+    liveIconPosition?: "left" | "right";
 }) => JSX.Element;
 //# sourceMappingURL=Avatar.d.ts.map

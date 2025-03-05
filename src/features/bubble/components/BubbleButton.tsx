@@ -22,6 +22,7 @@ type Props = ButtonTheme & {
   popoutMessageTheme: PopoutMessageTheme;
   avatarSrc?: string;
   toggleBot: () => void;
+  liveIconPosition?: "left" | "right";
 };
 
 const defaultButtonColor = "#3B81F6";
@@ -92,10 +93,17 @@ export const BubbleButton = (props: Props) => {
           class="fixed items-end"
           style={{
             "z-index": 42424243,
-            right: `${
-              (props.right ? props.right : defaultRight) +
-              (props.size === "large" ? 58 : 48)
-            }px`,
+            right:
+              props.position === "right"
+                ? `${
+                    (props.xOffset ? props.xOffset : defaultRight) +
+                    (props.size === "large" ? 58 : 48)
+                  }px`
+                : undefined,
+            left:
+              props.position === "left"
+                ? `${props.xOffset ? props.xOffset : defaultRight}px`
+                : undefined,
             bottom: `${
               (props.bottom ? props.bottom : defaultBottom) +
               (props.size === "large" ? 58 : 48)
@@ -119,7 +127,7 @@ export const BubbleButton = (props: Props) => {
               {props.popoutMessageTheme.message}
               <button
                 onClick={closePopout}
-                class="absolute top-[-6px] right-[-6px] h-5 w-5 flex justify-center items-center cursor-pointer hover:scale-125 active:scale-90 transition-transform duration-100"
+                class={`absolute top-[-6px] right-[-6px] h-5 w-5 flex justify-center items-center cursor-pointer hover:scale-125 active:scale-90 transition-transform duration-100`}
                 style={{
                   "z-index": 42424244,
                   "background-color": getContrastingColor(
@@ -159,9 +167,18 @@ export const BubbleButton = (props: Props) => {
         style={{
           "background-color": props.backgroundColor ?? defaultButtonColor,
           "z-index": 42424242,
-          right: props.right
-            ? `${props.right.toString()}px`
-            : `${defaultRight}px`,
+          right:
+            props.position === "right"
+              ? props.xOffset
+                ? `${props.xOffset.toString()}px`
+                : `${defaultRight}px`
+              : undefined,
+          left:
+            props.position === "left"
+              ? props.xOffset
+                ? `${props.xOffset.toString()}px`
+                : `${defaultRight}px`
+              : undefined,
           bottom: props.bottom
             ? `${props.bottom.toString()}px`
             : `${defaultBottom}px`,
@@ -246,6 +263,7 @@ export const BubbleButton = (props: Props) => {
               liveIcon="dot"
               isLive
               animate
+              liveIconPosition={props.liveIconPosition}
             />
           </Show>
         </Show>

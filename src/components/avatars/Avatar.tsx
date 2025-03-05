@@ -8,6 +8,7 @@ export const Avatar = (props: {
   liveIcon?: "border" | "dot";
   animate?: boolean;
   style?: JSX.CSSProperties | undefined;
+  liveIconPosition?: "left" | "right";
 }) => {
   return (
     <figure
@@ -34,7 +35,7 @@ export const Avatar = (props: {
           style={{
             position: "absolute",
             top: "84%",
-            left: "84%",
+            left: props.liveIconPosition === "right" ? "84%" : "16%",
             transform: "translate(-50%, -50%)",
             height: "33%",
             width: "33%",

@@ -71,6 +71,7 @@ export type ButtonTheme = {
   iconColor?: string;
   customIconSrc?: string;
   bottom?: number;
-  right?: number;
+  xOffset?: number;
+  position: "right" | "left";
   showAvatar?: boolean;
 };
