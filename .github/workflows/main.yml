@@ -1,0 +1,39 @@
+name: Build and Deploy to S3
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "16"
+          cache: "yarn"
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Build project
+        run: yarn build
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ vars.AWS_S3_CDN_REGION }}
+
+      - name: Deploy to S3
+        run: |
+          aws s3 cp ./dist/web.js s3://${{ vars.AWS_S3_CDN_BUCKET_NAME }}${{ vars.AWS_S3_PATH }}/web.js
+          aws s3 cp ./dist/web_path_var.js s3://${{ vars.AWS_S3_CDN_BUCKET_NAME }}${{ vars.AWS_S3_PATH }}/web_path_var.js
+          echo "Deployed"
