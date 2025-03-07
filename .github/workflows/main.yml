@@ -36,4 +36,5 @@ jobs:
         run: |
           aws s3 cp ./dist/web.js s3://${{ vars.AWS_S3_CDN_BUCKET_NAME }}${{ vars.AWS_S3_PATH }}/web.js
           aws s3 cp ./dist/web_path_var.js s3://${{ vars.AWS_S3_CDN_BUCKET_NAME }}${{ vars.AWS_S3_PATH }}/web_path_var.js
+          aws s3 cp ./test/demo_bot.html s3://${{ vars.AWS_S3_CDN_BUCKET_NAME }}${{ vars.AWS_S3_PATH }}/demo_bot.html
           echo "Deployed"
