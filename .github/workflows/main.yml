@@ -41,4 +41,4 @@ jobs:
 
       - name: Invalidate Cloudfront Cache
         run: |
-          aws cloudfront create-invalidation --distribution-id ${{ vars.AWS_CDN_CLOUDFRONT_DISTRIBUTION_ID }} --paths "${{ vars.AWS_S3_PATH }}/web.js" "${{ vars.AWS_S3_PATH }}/web_path_var.js" "${{ vars.AWS_S3_PATH }}/demo_bot.html"
+          aws cloudfront create-invalidation --distribution-id ${{ vars.AWS_CLOUDFRONT_CDN_DISTRIBUTION_ID }} --paths "${{ vars.AWS_S3_PATH }}/web.js" "${{ vars.AWS_S3_PATH }}/web_path_var.js" "${{ vars.AWS_S3_PATH }}/demo_bot.html"
