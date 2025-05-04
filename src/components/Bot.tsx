@@ -3,7 +3,6 @@ import {
   sendMessageQuery,
   IncomingInput,
   ConvoType,
-  sendLogConvoQuery,
   checkChatEngineHeartbeat,
 } from "@/queries/sendMessageQuery";
 import { TextInput } from "./inputs/textInput";
@@ -21,15 +20,19 @@ import { Badge } from "./Badge";
 // import socketIOClient, { Socket } from "socket.io-client";
 import { Popup } from "@/features/popup";
 import { QuestionButton } from "./bubbles/QuestionButton";
-import Config from "@/config";
-type messageType = "apiMessage" | "userMessage" | "usermessagewaiting";
 
-export type MessageType = {
+export enum MessageType {
+  BotMessage = "apiMessage",
+  UserMessage = "userMessage",
+  ErrorMessage = "errorMessage",
+}
+
+export type Message = {
   message: string;
-  type: messageType;
-  sourceDocuments?: any;
-  streamable?: boolean;
-  id?: string;
+  type: MessageType;
+  timestamp?: string;
+  minimumDisplayTime?: number;
+  loading?: boolean;
 };
 
 export type BotProps = {
@@ -71,11 +74,12 @@ export const Bot = (props: BotProps & { class?: string }) => {
 
   // let socketTimeout: NodeJS.Timeout | null = null;
 
-  const [messages, setMessages] = createSignal<MessageType[]>(
+  const [messages, setMessages] = createSignal<Message[]>(
     [
       {
         message: props.welcomeMessage ?? defaultWelcomeMessage,
-        type: "apiMessage",
+        type: MessageType.BotMessage,
+        timestamp: new Date().toISOString(),
       },
     ],
     { equals: false }
@@ -83,19 +87,7 @@ export const Bot = (props: BotProps & { class?: string }) => {
   // const [socketIOClientId, setSocketIOClientId] = createSignal("");
   const [chatEngineAlive, setChatEngineAlive] = createSignal(false);
 
-  const convo_message: ConvoType = {
-    messages: [
-      {
-        text: props.welcomeMessage ? props.welcomeMessage : "",
-        type: "bot",
-        timestamp: new Date().toISOString(),
-      },
-    ],
-    load_id: props.loadID,
-    realtor_id: props.userID,
-  };
-
-  sendLogConvoQuery(convo_message);
+  // TODO: Add a function to notify server of load
 
   onMount(() => {
     if (!bottomSpacer) return;
@@ -110,55 +102,13 @@ export const Bot = (props: BotProps & { class?: string }) => {
     }, 50);
   };
 
-  const updateLastMessage = (text: string) => {
-    // resetSocketTimeout();
-    setMessages((data) => {
-      const updated = data.map((item, i) => {
-        if (
-          i === data.length - 1 &&
-          item.type === "apiMessage" &&
-          item.streamable
-        ) {
-          return { ...item, message: item.message + text };
-        }
-        return item;
-      });
-      return [...updated];
-    });
-  };
-  const updateFullMessage = (text: string, id: string) => {
-    // resetSocketTimeout();
-    setMessages((data) => {
-      const updated = data.map((item, i) => {
-        if (item.type === "apiMessage" && item.id === id) {
-          return { ...item, message: text, streamable: false };
-        }
-        return item;
-      });
-      return [...updated];
-    });
-  };
-
-  const updateLastMessageSourceDocuments = (sourceDocuments: any) => {
-    // resetSocketTimeout();
-    setMessages((data) => {
-      const updated = data.map((item, i) => {
-        if (i === data.length - 1) {
-          return { ...item, sourceDocuments: sourceDocuments };
-        }
-        return item;
-      });
-      return [...updated];
-    });
-  };
-
   // Handle errors
   const handleError = (
     message = "Oops! There seems to be an error. Please try again."
   ) => {
     setMessages((prevMessages) => [
       ...prevMessages,
-      { message, type: "apiMessage" },
+      { message, type: MessageType.ErrorMessage },
     ]);
     setLoading(false);
     setUserInput("");
@@ -185,18 +135,15 @@ export const Bot = (props: BotProps & { class?: string }) => {
       setLoading(true);
       scrollToBottom();
       // Send user question and history to API
-      const welcomeMessage = props.welcomeMessage ?? defaultWelcomeMessage;
-      const messageList = messages().filter((msg) => !msg?.streamable);
-      const message_id = String(Math.random());
+      const messageList = messages();
       setMessages((prevMessages) => [
         ...prevMessages,
-        { message: value, type: "userMessage" },
-        { message: "", type: "apiMessage", streamable: true, id: message_id },
+        {
+          message: value,
+          type: MessageType.UserMessage,
+          timestamp: message_send_time,
+        },
       ]);
-
-      // if (!socket()) {
-      //   await initializeSocket();
-      // }
 
       const body: IncomingInput = {
         question: value,
@@ -205,74 +152,51 @@ export const Bot = (props: BotProps & { class?: string }) => {
       };
       if (props.chatflowConfig) body.overrideConfig = props.chatflowConfig;
 
-      // if (isChatFlowAvailableToStream())
-      //   body.socketIOClientId = socketIOClientId();
-      let bot_resp_time = new Date().toISOString();
       body.page_url = window.location.href;
-      // console.log(body);
+
       const result = await sendMessageQuery({
         chatflowid: props.chatflowid,
         apiHost: props.apiHost,
         body,
-      });
-      var text = "";
-      if (typeof result.data === "object" && "text" in result.data) {
-        text = result.data.text;
-      } else {
-        text = result.data;
-      }
-
-      const convo_message: ConvoType = {
-        messages: [
-          {
-            text: value,
-            type: "user",
-            timestamp: message_send_time,
-          },
-          {
-            text: text,
-            type: "bot",
-            timestamp: bot_resp_time,
-          },
-        ],
-        load_id: props.loadID,
-        realtor_id: props.userID,
-      };
-
-      sendLogConvoQuery(convo_message);
-      if (result.data) {
-        const data = handleVectaraMetadata(result.data);
-        if (typeof data === "object" && data.text && data.sourceDocuments) {
-          if (!chatEngineAlive()) {
-            setMessages((prevMessages) => [
-              ...prevMessages,
-              {
-                message: data.text,
-                sourceDocuments: data.sourceDocuments,
-                type: "apiMessage",
-              },
-            ]);
-          }
-        } else {
-          updateFullMessage(text, message_id);
-          //if (!isChatFlowAvailableToStream()) setMessages((prevMessages) => [...prevMessages, { message: data, type: 'apiMessage' }])
-        }
-        setLoading(false);
-        setUserInput("");
-        scrollToBottom();
-      }
-      if (result.error) {
-        const error = result.error;
+      }).catch((error) => {
         console.error(error);
-        const err: any = error;
-        const errorData =
-          typeof err === "string"
-            ? err
-            : err.response.data ||
-              `${err.response.status}: ${err.response.statusText}`;
-        handleError(errorData);
-        return;
-      }
+        handleError(error);
+        return undefined;
+      });
+
+      if (!result) return;
+
+      let bot_resp_time = new Date().getTime();
+
+      const newMessages = result.messages.map((message) => ({
+        ...message,
+        loading: message.minimumDisplayTime
+          ? bot_resp_time < message.minimumDisplayTime
+          : false,
+      }));
+
+      setMessages((prevMessages) => [...prevMessages, ...newMessages]);
+
+      newMessages
+        .filter((message) => message.loading && !!message.minimumDisplayTime)
+        .forEach((message) => {
+          setTimeout(() => {
+            console.log("setting loading to false", message);
+            setMessages((prevMessages) =>
+              prevMessages.map((m) =>
+                m.timestamp === message.timestamp &&
+                m.message === message.message
+                  ? { ...m, loading: false }
+                  : m
+              )
+            );
+            scrollToBottom();
+          }, message.minimumDisplayTime! - bot_resp_time);
+        });
+
+      setLoading(false);
+      setUserInput("");
+      scrollToBottom();
     } catch (error) {
       console.error(error);
       handleError();
@@ -350,7 +274,7 @@ export const Bot = (props: BotProps & { class?: string }) => {
       setMessages([
         {
           message: props.welcomeMessage ?? defaultWelcomeMessage,
-          type: "apiMessage",
+          type: MessageType.BotMessage,
         },
       ]);
       // cleanupSocket();
@@ -398,25 +322,25 @@ export const Bot = (props: BotProps & { class?: string }) => {
     return message;
   };
 
-  const removeDuplicateURL = (message: MessageType) => {
-    const visitedURLs: string[] = [];
-    const newSourceDocuments: any = [];
+  // const removeDuplicateURL = (message: Message) => {
+  //   const visitedURLs: string[] = [];
+  //   const newSourceDocuments: any = [];
 
-    message = handleVectaraMetadata(message);
+  //   message = handleVectaraMetadata(message);
 
-    message.sourceDocuments.forEach((source: any) => {
-      if (
-        isValidURL(source.metadata.source) &&
-        !visitedURLs.includes(source.metadata.source)
-      ) {
-        visitedURLs.push(source.metadata.source);
-        newSourceDocuments.push(source);
-      } else if (!isValidURL(source.metadata.source)) {
-        newSourceDocuments.push(source);
-      }
-    });
-    return newSourceDocuments;
-  };
+  //   message.sourceDocuments.forEach((source: any) => {
+  //     if (
+  //       isValidURL(source.metadata.source) &&
+  //       !visitedURLs.includes(source.metadata.source)
+  //     ) {
+  //       visitedURLs.push(source.metadata.source);
+  //       newSourceDocuments.push(source);
+  //     } else if (!isValidURL(source.metadata.source)) {
+  //       newSourceDocuments.push(source);
+  //     }
+  //   });
+  //   return newSourceDocuments;
+  // };
 
   const clickPrompt = (message: string) => {
     // console.log("clicked the button")
@@ -448,7 +372,7 @@ export const Bot = (props: BotProps & { class?: string }) => {
             <For each={[...messages()]}>
               {(message, index) => (
                 <>
-                  {message.type === "userMessage" && (
+                  {message.type === MessageType.UserMessage && (
                     <GuestBubble
                       message={message.message}
                       backgroundColor={props.userMessage?.backgroundColor}
@@ -457,21 +381,26 @@ export const Bot = (props: BotProps & { class?: string }) => {
                       avatarSrc={props.userMessage?.avatarSrc}
                     />
                   )}
-                  {message.type === "apiMessage" && (
+                  {message.type === MessageType.BotMessage && (
                     <BotBubble
                       message={message.message}
                       backgroundColor={props.botMessage?.backgroundColor}
                       textColor={props.botMessage?.textColor}
                       showAvatar={props.botMessage?.showAvatar}
                       avatarSrc={props.botMessage?.avatarSrc}
-                      loading={
-                        message.message === "" &&
-                        loading() &&
-                        index() === messages().length - 1
+                      hidden={
+                        message.loading &&
+                        messages().findLastIndex((m) => m.loading) !== index()
                       }
+                      loading={message.loading}
                     />
                   )}
-                  {message.sourceDocuments &&
+                  {message.type === MessageType.ErrorMessage && (
+                    <div class="bg-red-100 text-red-500 text-sm text-center max-w-[60%] mx-auto px-4 py-2 mb-6 mt-6 rounded-md">
+                      {message.message}
+                    </div>
+                  )}
+                  {/* {message.sourceDocuments &&
                     message.sourceDocuments.length && (
                       <div
                         style={{
@@ -502,10 +431,20 @@ export const Bot = (props: BotProps & { class?: string }) => {
                           }}
                         </For>
                       </div>
-                    )}
+                    )} */}
                 </>
               )}
             </For>
+            {loading() && (
+              <BotBubble
+                message={""}
+                backgroundColor={props.botMessage?.backgroundColor}
+                textColor={props.botMessage?.textColor}
+                showAvatar={props.botMessage?.showAvatar}
+                avatarSrc={props.botMessage?.avatarSrc}
+                loading={true}
+              />
+            )}
           </div>
           <Show when={!props?.fullScreen}>
             <button class="close-tab-btn" onclick={props.closeBoxFunction}>

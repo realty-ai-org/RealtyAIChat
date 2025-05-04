@@ -8,7 +8,7 @@
   "scripts": {
     "init": "conda create -n RealtyAI-Chat python=3.11 && conda activate RealtyAI-Chat",
     "dev": "concurrently \"yarn dev:server\" \"yarn dev:build\" --kill-others",
-    "dev:server": "python test/server.py 8080",
+    "dev:server": "python test/server.py 8328",
     "dev:build": "rollup --watch --config rollup.config.dev.js",
     "build": "rollup --config rollup.config.js",
     "lint": "eslint \"src/**/*.ts*\"",

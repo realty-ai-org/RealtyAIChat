@@ -11,6 +11,7 @@ type Props = {
   backgroundColor?: string;
   textColor?: string;
   loading?: boolean;
+  hidden?: boolean;
 };
 
 Marked.setOptions({ isNoP: true });
@@ -40,40 +41,42 @@ export const BotBubble = (props: Props) => {
 
   const showAvatar = props.showAvatar === undefined ? true : props.showAvatar;
   return (
-    <div
-      class="flex justify-start mb-2 items-start host-container"
-      style={{ "margin-right": "50px" }}
-    >
-      <Show when={showAvatar}>
-        <Avatar src={props.avatarSrc} liveIcon="dot" isLive />
-      </Show>
-      <Show
-        when={!props.loading}
-        fallback={
-          <LoadingBubble
-            backgroundColor={
-              props.backgroundColor ??
-              Config.theme.messages.bot.defaultBackgroundColor
-            }
-            textColor={
-              props.textColor ?? Config.theme.messages.bot.defaultTextColor
-            }
-          />
-        }
+    <Show when={!props.hidden}>
+      <div
+        class="flex justify-start mb-2 items-start host-container"
+        style={{ "margin-right": "50px" }}
       >
-        <span
-          ref={botMessageEl}
-          class="px-4 py-2 ml-2 whitespace-pre-wrap max-w-full chatbot-host-bubble"
-          data-testid="host-bubble"
-          style={{
-            "background-color":
-              props.backgroundColor ??
-              Config.theme.messages.bot.defaultBackgroundColor,
-            color:
-              props.textColor ?? Config.theme.messages.bot.defaultTextColor,
-          }}
-        />
-      </Show>
-    </div>
+        <Show when={showAvatar}>
+          <Avatar src={props.avatarSrc} liveIcon="dot" isLive />
+        </Show>
+        <Show
+          when={!props.loading}
+          fallback={
+            <LoadingBubble
+              backgroundColor={
+                props.backgroundColor ??
+                Config.theme.messages.bot.defaultBackgroundColor
+              }
+              textColor={
+                props.textColor ?? Config.theme.messages.bot.defaultTextColor
+              }
+            />
+          }
+        >
+          <span
+            ref={botMessageEl}
+            class="px-4 py-2 ml-2 whitespace-pre-wrap max-w-full chatbot-host-bubble"
+            data-testid="host-bubble"
+            style={{
+              "background-color":
+                props.backgroundColor ??
+                Config.theme.messages.bot.defaultBackgroundColor,
+              color:
+                props.textColor ?? Config.theme.messages.bot.defaultTextColor,
+            }}
+          />
+        </Show>
+      </div>
+    </Show>
   );
 };
