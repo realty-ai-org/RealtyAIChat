@@ -1,7 +1,6 @@
 declare const Config: {
     server: {
         userConfigApiUrl: string;
-        messageCollectorApiUrl: string;
     };
     bot: {
         defaultAvatarSrc: string;

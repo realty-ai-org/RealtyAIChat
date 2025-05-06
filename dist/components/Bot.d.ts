@@ -1,11 +1,15 @@
 import { BotMessageTheme, PopoutMessageTheme, TextInputTheme, UserMessageTheme } from "@/features/bubble/types";
-type messageType = "apiMessage" | "userMessage" | "usermessagewaiting";
-export type MessageType = {
+export declare enum MessageType {
+    BotMessage = "apiMessage",
+    UserMessage = "userMessage",
+    ErrorMessage = "errorMessage"
+}
+export type Message = {
     message: string;
-    type: messageType;
-    sourceDocuments?: any;
-    streamable?: boolean;
-    id?: string;
+    type: MessageType;
+    timestamp?: string;
+    minimumDisplayTime?: number;
+    loading?: boolean;
 };
 export type BotProps = {
     chatflowid: string;
@@ -32,5 +36,4 @@ export type BotProps = {
 export declare const Bot: (props: BotProps & {
     class?: string;
 }) => import("solid-js").JSX.Element;
-export {};
 //# sourceMappingURL=Bot.d.ts.map
