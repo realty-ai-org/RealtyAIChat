@@ -7,9 +7,10 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "init": "conda create -n RealtyAI-Chat python=3.11 && conda activate RealtyAI-Chat",
-    "dev": "concurrently \"yarn dev:server\" \"yarn dev:build\" --kill-others",
+    "dev": "concurrently \"yarn dev:server\" \"yarn build:dev\" --kill-others",
     "dev:server": "python test/server.py 8328",
-    "dev:build": "rollup --watch --config rollup.config.dev.js",
+    "build:dev": "rollup --watch --config rollup.config.dev.js",
+    "build:stage": "rollup --config rollup.config.stage.js",
     "build": "rollup --config rollup.config.js",
     "lint": "eslint \"src/**/*.ts*\"",
     "lint-fix": "eslint --fix \"src/**/*.ts*\""
