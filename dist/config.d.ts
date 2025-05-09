@@ -1,6 +1,7 @@
 declare const Config: {
     server: {
         userConfigApiUrl: string;
+        chatBotApiUrl: string;
     };
     bot: {
         defaultAvatarSrc: string;

@@ -7,15 +7,17 @@ import tailwindcss from "tailwindcss";
 import typescript from "@rollup/plugin-typescript";
 import { typescriptPaths } from "rollup-plugin-typescript-paths";
 import commonjs from "@rollup/plugin-commonjs";
-import { uglify } from "rollup-plugin-uglify";
-
+import replace from "@rollup/plugin-replace";
 const extensions = [".ts", ".tsx"];
 
 const indexConfig = {
   plugins: [
     resolve({ extensions, browser: true }),
     commonjs(),
-    // uglify(),
+    replace({
+      "process.env.ENVIRONMENT": JSON.stringify("production"),
+      preventAssignment: true,
+    }),
     babel({
       babelHelpers: "bundled",
       exclude: "node_modules/**",
