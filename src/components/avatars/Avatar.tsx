@@ -16,6 +16,8 @@ export const Avatar = (props: {
         "flex justify-center items-center rounded-full text-white relative flex-shrink-0 " +
         (isMobileCheck() ? "w-8 h-8 text-sm" : "w-10 h-10 text-xl")
       }
+      aria-hidden="true"
+      role="presentation"
       style={{
         ...(props.style || {}),
         ...(props.isLive &&
@@ -27,11 +29,16 @@ export const Avatar = (props: {
       <img
         src={props.src || Config.bot.defaultAvatarSrc}
         alt="Bot avatar"
+        loading="lazy"
+        decoding="async"
+        role="presentation"
+        aria-hidden="true"
         class="rounded-full object-cover w-full h-full"
       />
       <Show when={props.isLive && props.liveIcon === "dot"}>
         <div
           class={`live-dot ${props.animate ? "live-dot-animate" : ""}`}
+          aria-hidden="true"
           style={{
             position: "absolute",
             top: "84%",
