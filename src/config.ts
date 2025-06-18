@@ -4,10 +4,6 @@ const Config = {
       process.env.ENVIRONMENT === "development"
         ? "https://dev.config.realty-ai.com/dev/user_config_api"
         : "https://config.realty-ai.com/user_config_api",
-    chatBotApiUrl:
-      process.env.ENVIRONMENT === "development"
-        ? "https://dev.bot.realty-ai.com"
-        : "https://bot.realty-ai.com",
   },
   bot: {
     defaultAvatarSrc:
