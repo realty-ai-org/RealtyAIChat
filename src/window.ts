@@ -115,6 +115,10 @@ export const init = async (props: BotProps) => {
 
       // props.isOpen = props.isOpen || default_open
       const element = document.createElement("realty-ai-chatbot");
+      element.setAttribute("uuid", props.userID || "");
+      element.setAttribute("aria-label", "Chat support");
+      element.setAttribute("role", "region");
+      element.style.all = "initial";
       Object.assign(element, props);
       document.body.appendChild(element);
     })

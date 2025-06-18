@@ -447,7 +447,12 @@ export const Bot = (props: BotProps & { class?: string }) => {
             )}
           </div>
           <Show when={!props?.fullScreen}>
-            <button class="close-tab-btn" onclick={props.closeBoxFunction}>
+            <button
+              class="close-tab-btn"
+              onclick={props.closeBoxFunction}
+              aria-label="Close chat"
+              role="button"
+            >
               &times;
             </button>
           </Show>

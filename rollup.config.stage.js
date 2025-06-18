@@ -15,7 +15,7 @@ const indexConfig = {
     resolve({ extensions, browser: true }),
     commonjs(),
     replace({
-      "process.env.ENVIRONMENT": JSON.stringify("production"),
+      "process.env.ENVIRONMENT": JSON.stringify("development"),
       preventAssignment: true,
     }),
     babel({

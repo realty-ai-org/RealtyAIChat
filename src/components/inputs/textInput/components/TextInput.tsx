@@ -41,7 +41,7 @@ export const TextInput = (props: Props) => {
   };
 
   onMount(() => {
-    if (isMobileCheck() && inputRef) inputRef.focus();
+    if (inputRef) inputRef.focus();
   });
 
   return (
@@ -58,11 +58,14 @@ export const TextInput = (props: Props) => {
       onKeyDown={submitWhenEnter}
     >
       <ShortTextInput
+        id="realty-ai-chat-input"
         ref={inputRef as HTMLInputElement}
         onInput={handleInput}
         value={inputValue()}
         fontSize={props.fontSize}
         placeholder={props.placeholder ?? "Type your question"}
+        aria-label="Type your question"
+        role="textbox"
       />
       <SendButton
         sendButtonColor={props.sendButtonColor}

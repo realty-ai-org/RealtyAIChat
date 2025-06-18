@@ -113,6 +113,7 @@ export const BubbleButton = (props: Props) => {
           <div class="w-60 h-32 flex justify-end items-end">
             <div
               class="px-4 py-2 ml-2 whitespace-pre-wrap max-w-full chatbot-host-bubble chatbot-welcome-message relative"
+              aria-live="polite"
               style={{
                 "background-color":
                   props.popoutMessageTheme.backgroundColor ??
@@ -213,6 +214,8 @@ export const BubbleButton = (props: Props) => {
                 <Show when={isNotDefined(props.customIconSrc)} keyed>
                   <svg
                     viewBox="0 0 24 24"
+                    aria-hidden="true"
+                    role="presentation"
                     style={{
                       stroke: props.iconColor ?? defaultIconColor,
                     }}
@@ -237,11 +240,17 @@ export const BubbleButton = (props: Props) => {
                         : "scale-100 opacity-100") +
                       (props.size === "large" ? " w-11 h-11" : " w-9 h-9")
                     }
+                    loading="lazy"
+                    decoding="async"
+                    role="presentation"
+                    aria-hidden="true"
                     alt="Bubble button icon"
                   />
                 </Show>
                 <div
                   class="live-dot live-dot-animate"
+                  role="presentation"
+                  aria-hidden="true"
                   style={{
                     position: "absolute",
                     top: "84%",

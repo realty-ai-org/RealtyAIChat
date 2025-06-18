@@ -1,7 +1,9 @@
 const Config = {
   server: {
     userConfigApiUrl:
-      "https://vshdvtqafk.execute-api.us-east-2.amazonaws.com/default/user_config_api",
+      process.env.ENVIRONMENT === "development"
+        ? "https://dev.config.realty-ai.com/dev/user_config_api"
+        : "https://config.realty-ai.com/user_config_api",
   },
   bot: {
     defaultAvatarSrc:

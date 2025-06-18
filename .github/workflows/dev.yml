@@ -40,6 +40,9 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ vars.AWS_S3_CDN_REGION }}
 
+      - name: Build stage version for s3
+        run: yarn build:stage
+
       - name: Deploy to S3
         run: |
           aws s3 cp ./dist/web.js s3://${{ vars.AWS_S3_CDN_BUCKET_NAME }}${{ vars.AWS_S3_PATH }}/web.js
