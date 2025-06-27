@@ -1,0 +1,30 @@
+{
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnPaste": false,
+  "editor.formatOnSave": true,
+  "prettier.configPath": ".prettierrc",
+  "prettier.useEditorConfig": false,
+  "prettier.useTabs": false,
+  "python.terminal.activateEnvironment": true,
+  "search.exclude": {
+    "**/coverage": true,
+    "**/dist": true,
+    "**/node_modules": true,
+    "**/public-dist": true
+  },
+  "terminal.integrated.defaultProfile.osx": "realty-ai",
+  "terminal.integrated.env.osx": {
+    "ZSH_RUN_PROMPT": "yarn dev"
+  },
+  "terminal.integrated.profiles.osx": {
+    "realty-ai": {
+      "args": [
+        "-l"
+      ],
+      "env": {
+        "AWS_PROFILE": "realty-ai"
+      },
+      "path": "zsh"
+    }
+  }
+}
