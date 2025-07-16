@@ -8,7 +8,8 @@ const chatbot = parseChatbot();
 injectChatbotInWindow(chatbot);
 
 // const script_id = document.getElementById("realty_ai")?.getAttribute("data-realityaiid");
-const script_id = document.getElementById("realty_ai")?.dataset.realityaiid;
+const script = document.getElementById("realty_ai");
+const script_id = script?.dataset.realtyaiid || script?.dataset.realityaiid;
 
 // prettier-ignore
 console.log("%c[REALTY-AI-BOT]", "color: #3B81F6; font-weight: bold;", script_id);
