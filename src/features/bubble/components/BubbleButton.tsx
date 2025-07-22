@@ -2,8 +2,6 @@ import {
   onMount,
   Show,
   createSignal,
-  useTransition,
-  createEffect,
 } from "solid-js";
 import {
   getContrastingColor,
