@@ -134,7 +134,7 @@ export const Bubble = (props: BubbleProps) => {
         popoutMessageTheme={{
           message:
             bubbleProps.theme?.popoutMessage?.message ??
-            "Need help? Let's chat!",
+            ["Need help? Let's chat!"],
           backgroundColor:
             bubbleProps.theme?.popoutMessage?.backgroundColor ??
             Config.theme.popoutMessage.defaultBackgroundColor,

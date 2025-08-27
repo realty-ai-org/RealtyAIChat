@@ -47,7 +47,7 @@ export type BotMessageTheme = {
 };
 
 export type PopoutMessageTheme = {
-  message?: string;
+  message?: string[];
   delay?: number;
   backgroundColor?: string;
   textColor?: string;
