@@ -7,6 +7,7 @@ import {
   onMount,
 } from 'solid-js'
 import { isNotDefined } from '@/utils/index'
+import { sanitizeHtmlText } from '@/utils/safety'
 
 export type PopupProps = {
   value?: any
@@ -50,7 +51,7 @@ export const Popup = (props: PopupProps) => {
 
   onMount(() => {
     if (preEl) {
-      preEl.innerHTML = syntaxHighlight(JSON.stringify(props?.value, undefined, 2))
+      preEl.innerHTML = syntaxHighlight(sanitizeHtmlText(JSON.stringify(props?.value, undefined, 2)))
     }
   })
 

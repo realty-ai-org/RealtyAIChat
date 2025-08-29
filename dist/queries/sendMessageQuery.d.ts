@@ -1,17 +1,4 @@
-import { Message, MessageType } from "@/components/Bot";
-export type IncomingInput = {
-    question: string;
-    history: Message[];
-    load_id: string;
-    overrideConfig?: Record<string, unknown>;
-    socketIOClientId?: string;
-    page_url?: string;
-};
-export type MessageRequest = {
-    chatflowid: string;
-    apiHost?: string;
-    body?: IncomingInput;
-};
+import { Message, MessageRequest, MessageType } from "@/types/message";
 interface ServerMessage {
     type: MessageType;
     message: string;

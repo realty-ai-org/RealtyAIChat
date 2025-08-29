@@ -1,15 +1,11 @@
 import { createSignal, createEffect, For, onMount, Show } from "solid-js";
 import {
   sendMessageQuery,
-  IncomingInput,
-  ConvoType,
   checkChatEngineHeartbeat,
 } from "@/queries/sendMessageQuery";
 import { TextInput } from "./inputs/textInput";
 import { GuestBubble } from "./bubbles/GuestBubble";
 import { BotBubble } from "./bubbles/BotBubble";
-import { LoadingBubble } from "./bubbles/LoadingBubble";
-import { SourceBubble } from "./bubbles/SourceBubble";
 import {
   BotMessageTheme,
   PopoutMessageTheme,
@@ -17,23 +13,8 @@ import {
   UserMessageTheme,
 } from "@/features/bubble/types";
 import { Badge } from "./Badge";
-// import socketIOClient, { Socket } from "socket.io-client";
-import { Popup } from "@/features/popup";
 import { QuestionButton } from "./bubbles/QuestionButton";
-
-export enum MessageType {
-  BotMessage = "apiMessage",
-  UserMessage = "userMessage",
-  ErrorMessage = "errorMessage",
-}
-
-export type Message = {
-  message: string;
-  type: MessageType;
-  timestamp?: string;
-  minimumDisplayTime?: number;
-  loading?: boolean;
-};
+import { IncomingInput, Message, MessageType } from "@/types/message";
 
 export type BotProps = {
   chatflowid: string;
@@ -67,12 +48,7 @@ export const Bot = (props: BotProps & { class?: string }) => {
 
   const [userInput, setUserInput] = createSignal("");
   const [loading, setLoading] = createSignal(false);
-  const [sourcePopupOpen, setSourcePopupOpen] = createSignal(false);
-  const [sourcePopupSrc, setSourcePopupSrc] = createSignal({});
   const [questionClicked, setQuestionClicked] = createSignal(false);
-  // const [socket, setSocket] = createSignal<Socket | null>(null);
-
-  // let socketTimeout: NodeJS.Timeout | null = null;
 
   const [messages, setMessages] = createSignal<Message[]>(
     [
@@ -84,7 +60,6 @@ export const Bot = (props: BotProps & { class?: string }) => {
     ],
     { equals: false }
   );
-  // const [socketIOClientId, setSocketIOClientId] = createSignal("");
   const [chatEngineAlive, setChatEngineAlive] = createSignal(false);
 
   // TODO: Add a function to notify server of load
@@ -219,52 +194,6 @@ export const Bot = (props: BotProps & { class?: string }) => {
     return available;
   };
 
-  // const initializeSocket = async () => {
-  //   if (socket()) return;
-  //   // prettier-ignore
-  //   console.log("%c[SOCKET]", "color: #F59302; font-weight: bold;", "Initializing");
-
-  //   const s = socketIOClient(props.apiHost as string);
-
-  //   s.on("connect", () => {
-  //     setSocketIOClientId(s.id);
-
-  //     // prettier-ignore
-  //     console.log("%c[SOCKET]", "color: #F59302; font-weight: bold;", "Connected", s.id);
-  //   });
-
-  //   s.on("start", () => {
-  //     // setMessages((prevMessages) => [...prevMessages, { message: '', type: 'apiMessage' }])
-  //     // prettier-ignore
-  //     console.log("%c[SOCKET]", "color: #F59302; font-weight: bold;", "Started");
-  //   });
-
-  //   s.on("sourceDocuments", updateLastMessageSourceDocuments);
-
-  //   s.on("token", updateLastMessage);
-
-  //   s.on("disconnect", () => {
-  //     // prettier-ignore
-  //     console.log("%c[SOCKET]", "color: #F59302; font-weight: bold;", "Disconnected");
-  //     setSocketIOClientId("");
-  //     setSocket(null);
-  //   });
-
-  //   setSocket(s);
-
-  //   // prettier-ignore
-  //   console.log("%c[SOCKET]", "color: #F59302; font-weight: bold;", "Configured");
-  // };
-
-  // const cleanupSocket = () => {
-  //   const s = socket();
-  //   if (s) {
-  //     s.disconnect();
-  //     setSocket(null);
-  //     setSocketIOClientId("");
-  //   }
-  // };
-
   createEffect(() => {
     checkStreamAvailability();
 
@@ -277,74 +206,10 @@ export const Bot = (props: BotProps & { class?: string }) => {
           type: MessageType.BotMessage,
         },
       ]);
-      // cleanupSocket();
     };
   });
 
-  // const resetSocketTimeout = () => {
-  //   if (socketTimeout) clearTimeout(socketTimeout);
-  //   socketTimeout = setTimeout(() => {
-  //     // prettier-ignore
-  //     console.log("%c[SOCKET]", "color: #F59302; font-weight: bold;", "Closing due to inactivity");
-  //     cleanupSocket();
-  //   }, Config.bot.socketTimeout);
-  // };
-
-  const handleTextInputChange = () => {
-    // resetSocketTimeout();
-    // initializeSocket();
-  };
-
-  const isValidURL = (url: string): URL | undefined => {
-    try {
-      return new URL(url);
-    } catch (err) {
-      return undefined;
-    }
-  };
-
-  const handleVectaraMetadata = (message: any): any => {
-    if (message.sourceDocuments && message.sourceDocuments[0].metadata.length) {
-      message.sourceDocuments = message.sourceDocuments.map((docs: any) => {
-        const newMetadata: { [name: string]: any } = docs.metadata.reduce(
-          (newMetadata: any, metadata: any) => {
-            newMetadata[metadata.name] = metadata.value;
-            return newMetadata;
-          },
-          {}
-        );
-        return {
-          pageContent: docs.pageContent,
-          metadata: newMetadata,
-        };
-      });
-    }
-    return message;
-  };
-
-  // const removeDuplicateURL = (message: Message) => {
-  //   const visitedURLs: string[] = [];
-  //   const newSourceDocuments: any = [];
-
-  //   message = handleVectaraMetadata(message);
-
-  //   message.sourceDocuments.forEach((source: any) => {
-  //     if (
-  //       isValidURL(source.metadata.source) &&
-  //       !visitedURLs.includes(source.metadata.source)
-  //     ) {
-  //       visitedURLs.push(source.metadata.source);
-  //       newSourceDocuments.push(source);
-  //     } else if (!isValidURL(source.metadata.source)) {
-  //       newSourceDocuments.push(source);
-  //     }
-  //   });
-  //   return newSourceDocuments;
-  // };
-
   const clickPrompt = (message: string) => {
-    // console.log("clicked the button")
-    // console.log(message)
     handleSubmit(message);
     setQuestionClicked(true);
   };
@@ -400,38 +265,6 @@ export const Bot = (props: BotProps & { class?: string }) => {
                       {message.message}
                     </div>
                   )}
-                  {/* {message.sourceDocuments &&
-                    message.sourceDocuments.length && (
-                      <div
-                        style={{
-                          display: "flex",
-                          "flex-direction": "row",
-                          width: "100%",
-                        }}
-                      >
-                        <For each={[...removeDuplicateURL(message)]}>
-                          {(src) => {
-                            const URL = isValidURL(src.metadata.source);
-                            return (
-                              <SourceBubble
-                                pageContent={
-                                  URL ? URL.pathname : src.pageContent
-                                }
-                                metadata={src.metadata}
-                                onSourceClick={() => {
-                                  if (URL) {
-                                    window.open(src.metadata.source, "_blank");
-                                  } else {
-                                    setSourcePopupSrc(src);
-                                    setSourcePopupOpen(true);
-                                  }
-                                }}
-                              />
-                            );
-                          }}
-                        </For>
-                      </div>
-                    )} */}
                 </>
               )}
             </For>
@@ -488,7 +321,6 @@ export const Bot = (props: BotProps & { class?: string }) => {
             fontSize={props.fontSize}
             defaultValue={userInput()}
             onSubmit={handleSubmit}
-            onChange={handleTextInputChange}
           />
         </div>
 
@@ -500,13 +332,6 @@ export const Bot = (props: BotProps & { class?: string }) => {
         />
         <BottomSpacer ref={bottomSpacer} />
       </div>
-      {sourcePopupOpen() && (
-        <Popup
-          isOpen={sourcePopupOpen()}
-          value={sourcePopupSrc()}
-          onClose={() => setSourcePopupOpen(false)}
-        />
-      )}
     </>
   );
 };

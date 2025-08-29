@@ -1,16 +1,4 @@
 import { BotMessageTheme, PopoutMessageTheme, TextInputTheme, UserMessageTheme } from "@/features/bubble/types";
-export declare enum MessageType {
-    BotMessage = "apiMessage",
-    UserMessage = "userMessage",
-    ErrorMessage = "errorMessage"
-}
-export type Message = {
-    message: string;
-    type: MessageType;
-    timestamp?: string;
-    minimumDisplayTime?: number;
-    loading?: boolean;
-};
 export type BotProps = {
     chatflowid: string;
     loadID: string;

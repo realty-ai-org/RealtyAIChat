@@ -2,8 +2,6 @@ import {
   onMount,
   Show,
   createSignal,
-  useTransition,
-  createEffect,
 } from "solid-js";
 import {
   getContrastingColor,
@@ -125,7 +123,13 @@ export const BubbleButton = (props: Props) => {
                 "box-shadow": "0px 0px 10px 0px rgba(0, 0, 0, 0.1)",
               }}
             >
-              {props.popoutMessageTheme.message}
+              {props.popoutMessageTheme.message
+                ? props.popoutMessageTheme.message[
+                    Math.floor(
+                      Math.random() * props.popoutMessageTheme.message.length
+                    )
+                  ]
+                : ""}
               <button
                 onClick={closePopout}
                 class={`absolute top-[-6px] right-[-6px] h-5 w-5 flex justify-center items-center cursor-pointer hover:scale-125 active:scale-90 transition-transform duration-100`}

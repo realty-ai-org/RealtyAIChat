@@ -1,6 +1,5 @@
 import { Show, onMount } from "solid-js";
 import { Avatar } from "../avatars/Avatar";
-import { Marked } from "@ts-stack/markdown";
 import Config from "@/config";
 
 type Props = {
@@ -11,14 +10,12 @@ type Props = {
   textColor?: string;
 };
 
-Marked.setOptions({ isNoP: true });
-
 export const GuestBubble = (props: Props) => {
   let userMessageEl: HTMLDivElement | undefined;
 
   onMount(() => {
     if (userMessageEl) {
-      userMessageEl.innerHTML = Marked.parse(props.message);
+      userMessageEl.textContent = props.message;
     }
   });
 

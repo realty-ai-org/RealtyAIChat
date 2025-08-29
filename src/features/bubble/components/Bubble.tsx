@@ -18,12 +18,6 @@ export type BubbleProps = BotProps & BubbleParams;
 export const Bubble = (props: BubbleProps) => {
   const [bubbleProps] = splitProps(props, ["theme", "popoutMessageConfig"]);
   const [popoutConfigProps] = splitProps(props, ["popoutMessageConfig"]);
-  //check cookie for how many times the site as been loaded
-  // const numLoadedCookie: string =  getCookie("numLoadedChat");
-  // let numLoaded: number  = parseInt(numLoadedCookie);
-  // numLoaded = numLoaded ? numLoaded : 0;
-
-  //const isMobile =  window?.innerWidth ? (window?.innerWidth < 1000): false;
   const isMobile = isMobileCheck();
   const height_calc = isMobile
     ? "calc(min(350px, max(100% - 100px,275px)))"
@@ -41,7 +35,6 @@ export const Bubble = (props: BubbleProps) => {
     defaultOpen = false;
   }
 
-  //isOpen = false
   const [isBotOpened, setIsBotOpened] = createSignal(defaultOpen);
   const [isBotStarted, setIsBotStarted] = createSignal(defaultOpen);
   const [isVisible, setIsVisible] = createSignal(true);
@@ -141,7 +134,7 @@ export const Bubble = (props: BubbleProps) => {
         popoutMessageTheme={{
           message:
             bubbleProps.theme?.popoutMessage?.message ??
-            "Need help? Let's chat!",
+            ["Need help? Let's chat!"],
           backgroundColor:
             bubbleProps.theme?.popoutMessage?.backgroundColor ??
             Config.theme.popoutMessage.defaultBackgroundColor,

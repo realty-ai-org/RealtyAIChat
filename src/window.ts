@@ -45,7 +45,15 @@ const fetchAndParseBasicConfig = <T extends BotProps>(props: T) => {
     // prettier-ignore
     console.log("%c[REALTY-AI-BOT]", "color: #3B81F6; font-weight: bold;", "Config Fetched", config_data);
 
-    props.theme = config_data?.theme;
+
+
+    props.theme = config_data?.theme ? {
+      ...config_data?.theme,
+      popoutMessage: {
+        ...config_data?.theme?.popoutMessage,
+        message: config_data?.theme?.popoutMessage?.message?.split("\n") || [],
+      },
+    } : undefined;
     props.chatflowid = config_data?.chatflowid;
     props.apiHost = config_data?.apiHost;
     props.includeQuestions = config_data?.includeQuestions;

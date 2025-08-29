@@ -1,22 +1,5 @@
-import { Message, MessageType } from "@/components/Bot";
-import Config from "@/config";
+import { Message, MessageRequest, MessageType } from "@/types/message";
 import { sendRequest } from "@/utils/index";
-import { min } from "lodash";
-
-export type IncomingInput = {
-  question: string;
-  history: Message[];
-  load_id: string;
-  overrideConfig?: Record<string, unknown>;
-  socketIOClientId?: string;
-  page_url?: string;
-};
-
-export type MessageRequest = {
-  chatflowid: string;
-  apiHost?: string;
-  body?: IncomingInput;
-};
 
 interface ServerMessage {
   type: MessageType;
