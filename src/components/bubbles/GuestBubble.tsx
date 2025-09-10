@@ -1,6 +1,7 @@
 import { Show, onMount } from "solid-js";
 import { Avatar } from "../avatars/Avatar";
 import Config from "@/config";
+import { separateTextIntoZeroWidthSpacesParts } from "@/utils/safety";
 
 type Props = {
   message: string;
@@ -16,6 +17,7 @@ export const GuestBubble = (props: Props) => {
   onMount(() => {
     if (userMessageEl) {
       userMessageEl.textContent = props.message;
+      userMessageEl.innerHTML = separateTextIntoZeroWidthSpacesParts(userMessageEl.innerHTML);
     }
   });
 

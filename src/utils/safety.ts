@@ -26,6 +26,24 @@ export const parseMarkdownSafely = (markdown: string): string => {
   return sanitizeMarkdownHtml(html);
 };
 
+export const separateTextIntoZeroWidthSpacesParts = (message: string, maxWordLength: number = 25, partLength: number = 5): string => {
+  const words = message.split(' ');
+  const result = [];
+
+  for (const word of words) {
+    if (word.length > maxWordLength) {
+      const parts = [];
+      for (let i = 0; i < word.length; i += partLength) {
+        parts.push(word.slice(i, i + partLength));
+      }
+      result.push(parts.join('&#8203;'));
+    } else {
+      result.push(word);
+    }
+  }
+  return result.join(' ');
+}
+
 // Custom sanitization function for markdown HTML
 export const sanitizeMarkdownHtml = (html: string): string => {
   // Create a temporary DOM element to parse and sanitize
@@ -68,6 +86,10 @@ export const sanitizeMarkdownHtml = (html: string): string => {
           // Add security attributes to safe links
           link.setAttribute('target', '_blank');
           link.setAttribute('rel', 'noopener noreferrer');
+        }
+        if (link.innerHTML && !link.querySelector('*')) {
+          // Separate long text into zero width spaces parts
+          link.innerHTML = separateTextIntoZeroWidthSpacesParts(link.innerHTML, 5);
         }
       } catch {
         // Remove invalid URLs

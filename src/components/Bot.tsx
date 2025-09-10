@@ -289,7 +289,7 @@ export const Bot = (props: BotProps & { class?: string }) => {
               &times;
             </button>
           </Show>
-          <Show when={props.includeQuestions && !questionClicked()}>
+          <Show when={props.includeQuestions && !questionClicked() && !userInput()}>
             <div
               class="question-container flex gap-3 outer-questions"
               style={{
@@ -320,6 +320,7 @@ export const Bot = (props: BotProps & { class?: string }) => {
             sendButtonColor={props.textInput?.sendButtonColor}
             fontSize={props.fontSize}
             defaultValue={userInput()}
+            onChange={setUserInput}
             onSubmit={handleSubmit}
           />
         </div>
