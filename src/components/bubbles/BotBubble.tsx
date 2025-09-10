@@ -31,7 +31,7 @@ export const BotBubble = (props: Props) => {
         style={{ "margin-right": "50px" }}
       >
         <Show when={showAvatar}>
-          <Avatar src={props.avatarSrc} liveIcon="dot" isLive />
+          <Avatar src={props.avatarSrc} liveIcon="dot" isLive class="mr-2" />
         </Show>
         <Show
           when={!props.loading}
@@ -49,7 +49,7 @@ export const BotBubble = (props: Props) => {
         >
           <span
             ref={botMessageEl}
-            class={`px-4 py-2 ${showAvatar ? "ml-2" : ""} whitespace-pre-wrap max-w-full chatbot-host-bubble`}
+            class={`px-4 py-2 whitespace-pre-wrap max-w-full chatbot-host-bubble`}
             data-testid="host-bubble"
             aria-live="polite"
             style={{

@@ -1390,7 +1390,7 @@ const Avatar = props => {
       }
     }), null);
     createRenderEffect(_p$ => {
-      const _v$3 = "flex justify-center items-center rounded-full text-white relative flex-shrink-0 " + (isMobileCheck() ? "w-8 h-8 text-sm" : "w-10 h-10 text-xl"),
+      const _v$3 = "flex justify-center items-center rounded-full text-white relative flex-shrink-0 " + (props.class || "") + (isMobileCheck() ? "w-8 h-8 text-sm" : "w-10 h-10 text-xl"),
         _v$4 = {
           ...(props.style || {}),
           ...(props.isLive && props.liveIcon === "border" && {
@@ -3375,7 +3375,7 @@ const TypingBubble = props => (() => {
   return _el$;
 })();
 
-const _tmpl$$6 = /*#__PURE__*/template(`<div class="flex justify-start mb-2 items-start animate-fade-in host-container"><span class="px-4 py-4 ml-2 whitespace-pre-wrap max-w-full chatbot-host-bubble" data-testid="host-bubble">`);
+const _tmpl$$6 = /*#__PURE__*/template(`<div class="flex justify-start mb-2 items-start animate-fade-in host-container"><span class="px-4 py-4 whitespace-pre-wrap max-w-full chatbot-host-bubble" data-testid="host-bubble">`);
 const LoadingBubble = props => (() => {
   const _el$ = _tmpl$$6(),
     _el$2 = _el$.firstChild;
@@ -3388,7 +3388,7 @@ const LoadingBubble = props => (() => {
   return _el$;
 })();
 
-const _tmpl$$5 = /*#__PURE__*/template(`<span data-testid="host-bubble" aria-live="polite">`),
+const _tmpl$$5 = /*#__PURE__*/template(`<span class="px-4 py-2 whitespace-pre-wrap max-w-full chatbot-host-bubble" data-testid="host-bubble" aria-live="polite">`),
   _tmpl$2$5 = /*#__PURE__*/template(`<div class="flex justify-start mb-2 items-start host-container">`);
 const BotBubble = props => {
   let botMessageEl;
@@ -3413,7 +3413,8 @@ const BotBubble = props => {
               return props.avatarSrc;
             },
             liveIcon: "dot",
-            isLive: true
+            isLive: true,
+            "class": "mr-2"
           });
         }
       }), null);
@@ -3435,7 +3436,6 @@ const BotBubble = props => {
           const _el$2 = _tmpl$$5();
           const _ref$ = botMessageEl;
           typeof _ref$ === "function" ? use(_ref$, _el$2) : botMessageEl = _el$2;
-          className(_el$2, `px-4 py-2 ${showAvatar ? "ml-2" : ""} whitespace-pre-wrap max-w-full chatbot-host-bubble`);
           createRenderEffect(_p$ => {
             const _v$ = props.backgroundColor ?? Config.theme.messages.bot.defaultBackgroundColor,
               _v$2 = props.textColor ?? Config.theme.messages.bot.defaultTextColor;
@@ -3820,9 +3820,7 @@ const Bot = props => {
         get textColor() {
           return props.botMessage?.textColor;
         },
-        get showAvatar() {
-          return props.botMessage?.showAvatar;
-        },
+        showAvatar: false,
         get avatarSrc() {
           return props.botMessage?.avatarSrc;
         },

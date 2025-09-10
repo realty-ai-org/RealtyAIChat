@@ -334,7 +334,7 @@ export const Bot = (props: BotProps & { class?: string }) => {
                 message={""}
                 backgroundColor={props.botMessage?.backgroundColor}
                 textColor={props.botMessage?.textColor}
-                showAvatar={props.botMessage?.showAvatar}
+                showAvatar={false}//props.botMessage?.showAvatar}
                 avatarSrc={props.botMessage?.avatarSrc}
                 loading={true}
               />

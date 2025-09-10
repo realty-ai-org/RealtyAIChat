@@ -6,5 +6,6 @@ export declare const Avatar: (props: {
     animate?: boolean;
     style?: JSX.CSSProperties | undefined;
     liveIconPosition?: "left" | "right";
+    class?: string;
 }) => JSX.Element;
 //# sourceMappingURL=Avatar.d.ts.map

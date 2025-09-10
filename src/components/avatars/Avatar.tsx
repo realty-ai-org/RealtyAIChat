@@ -9,11 +9,13 @@ export const Avatar = (props: {
   animate?: boolean;
   style?: JSX.CSSProperties | undefined;
   liveIconPosition?: "left" | "right";
+  class?: string;
 }) => {
   return (
     <figure
       class={
         "flex justify-center items-center rounded-full text-white relative flex-shrink-0 " +
+        (props.class || "") +
         (isMobileCheck() ? "w-8 h-8 text-sm" : "w-10 h-10 text-xl")
       }
       aria-hidden="true"
