@@ -15,6 +15,7 @@ import {
 import { Badge } from "./Badge";
 import { QuestionButton } from "./bubbles/QuestionButton";
 import { IncomingInput, Message, MessageType } from "@/types/message";
+import { Avatar } from "./avatars/Avatar";
 
 export type BotProps = {
   chatflowid: string;
@@ -33,6 +34,8 @@ export type BotProps = {
   textInput?: TextInputTheme;
   poweredByTextColor?: string;
   badgeBackgroundColor?: string;
+  headerColor?: string;
+  headerTextColor?: string;
   fontSize?: number;
   fullScreen?: boolean;
   questions?: Array<string>;
@@ -49,6 +52,7 @@ export const Bot = (props: BotProps & { class?: string }) => {
   const [userInput, setUserInput] = createSignal("");
   const [loading, setLoading] = createSignal(false);
   const [questionClicked, setQuestionClicked] = createSignal(false);
+  const [menuOpen, setMenuOpen] = createSignal(false);
 
   const [messages, setMessages] = createSignal<Message[]>(
     [
@@ -223,7 +227,64 @@ export const Bot = (props: BotProps & { class?: string }) => {
           props.class
         }
       >
-        <div class="flex w-full h-full justify-center">
+
+        <Show when={menuOpen()}>
+          <div class="w-full h-full absolute top-0 left-0 z-[1001]" onclick={() => setMenuOpen(false)}>
+            <div class="w-full h-[64px]"></div>
+            <div class="w-full h-full bg-black bg-opacity-30"></div>
+          </div>
+        </Show>
+        <div class="w-full h-[64px] flex items-center gap-4 p-4 relative" style={{ "background-color": props.headerColor || "#3B81F6" }}>
+          <Show when={props.botMessage?.avatarSrc}>
+            <Avatar src={props.botMessage?.avatarSrc} liveIcon="dot" isLive />
+          </Show>
+          <h1 class="text-xl flex-1 m-0" style={{ color: props.headerTextColor || "#ffffff" }}>
+            Madison
+          </h1>
+
+          <button
+              class="border rounded-md p-2 w-8 h-8 flex items-center justify-center"
+              style={{
+                color: props.headerTextColor || "#ffffff",
+                "border-color": props.headerTextColor || "#ffffff"
+              }}
+              onclick={() => setMenuOpen(!menuOpen())}
+              aria-label="Close chat"
+              role="button"
+            >
+            &#x2630;
+          </button>
+
+          <Show when={menuOpen()}>
+            <div class="flex flex-col items-start gap-4 absolute right-4 top-[64px] w-[60%] p-4 bg-white rounded-t-none rounded-b-md z-[1002] shadow-lg">
+              <div>
+                <div>Notifications</div>
+              </div>
+              <div>
+                <div>Clear Chat</div>
+              </div>
+              <div>
+                <div>Restart Conversation</div>
+              </div>
+            </div>
+          </Show>
+
+          <Show when={!props?.fullScreen}>
+            <button
+              class="border rounded-md p-2 w-8 h-8 flex items-center justify-center"
+              style={{
+                color: props.headerTextColor || "#ffffff",
+                "border-color": props.headerTextColor || "#ffffff"
+              }}
+              onclick={props.closeBoxFunction}
+              aria-label="Close chat"
+              role="button"
+            >
+              &times;
+            </button>
+          </Show>
+        </div>
+        <div class="flex w-full h-[calc(100%-64px)] justify-center">
           <div
             style={{
               "padding-bottom":
@@ -251,7 +312,7 @@ export const Bot = (props: BotProps & { class?: string }) => {
                       message={message.message}
                       backgroundColor={props.botMessage?.backgroundColor}
                       textColor={props.botMessage?.textColor}
-                      showAvatar={props.botMessage?.showAvatar}
+                      showAvatar={false}//props.botMessage?.showAvatar}
                       avatarSrc={props.botMessage?.avatarSrc}
                       hidden={
                         message.loading &&
@@ -279,16 +340,6 @@ export const Bot = (props: BotProps & { class?: string }) => {
               />
             )}
           </div>
-          <Show when={!props?.fullScreen}>
-            <button
-              class="close-tab-btn"
-              onclick={props.closeBoxFunction}
-              aria-label="Close chat"
-              role="button"
-            >
-              &times;
-            </button>
-          </Show>
           <Show when={props.includeQuestions && !questionClicked() && !userInput()}>
             <div
               class="question-container flex gap-3 outer-questions"

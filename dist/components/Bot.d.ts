@@ -16,6 +16,8 @@ export type BotProps = {
     textInput?: TextInputTheme;
     poweredByTextColor?: string;
     badgeBackgroundColor?: string;
+    headerColor?: string;
+    headerTextColor?: string;
     fontSize?: number;
     fullScreen?: boolean;
     questions?: Array<string>;
