@@ -2,6 +2,7 @@ import {
   onMount,
   Show,
   createSignal,
+  createEffect,
 } from "solid-js";
 import {
   getContrastingColor,
@@ -13,9 +14,11 @@ import { ButtonTheme, PopoutMessageConfig, PopoutMessageTheme } from "../types";
 import isMobileCheck from "@/utils/isMobileCheck";
 import { Avatar } from "@/components/avatars/Avatar";
 import Config from "@/config";
+import { create } from "node:domain";
 type Props = ButtonTheme & {
   userID: string;
   isBotOpened: boolean;
+  canShowPopout: boolean;
   popoutMessageConfig: PopoutMessageConfig | undefined;
   popoutMessageTheme: PopoutMessageTheme;
   avatarSrc?: string;
@@ -30,63 +33,84 @@ const defaultRight = 20;
 
 export const BubbleButton = (props: Props) => {
   const popout_count_cookie_name = `realty-ai-bot-popout-count-${props.userID}`;
-  const popout_closed_cookie_name = `realty-ai-bot-popout-closed-${props.userID}`;
+  const isMobile = isMobileCheck();
 
-  const [popoutMessageVisible, setPopoutMessageVisible] = createSignal(false);
+  const [popoutClosed, setPopoutClosed] = createSignal(false);
+  const [popoutShown, setPopoutShown] = createSignal(false);
+  const [popoutMessage, setPopoutMessage] = createSignal("");
 
   var popoutOpenCount = Number(getCookie(popout_count_cookie_name));
   if (!popoutOpenCount) {
     popoutOpenCount = 0;
   }
 
-  var popoutClosed = getCookie(popout_closed_cookie_name) === "true";
-
   const openPopout = () => {
     popoutOpenCount++;
     setCookie(popout_count_cookie_name, popoutOpenCount.toString(), 1 / 48);
-    setPopoutMessageVisible(true);
+    setPopoutShown(true);
+    setPopoutMessage(props.popoutMessageTheme.message
+      ? props.popoutMessageTheme.message[
+          Math.floor(
+            Math.random() * props.popoutMessageTheme.message.length
+          )
+        ]
+      : "");
   };
 
   const closePopout = () => {
-    setPopoutMessageVisible(false);
     popoutOpenCount = props.popoutMessageConfig?.maxPopouts || 0;
-    popoutClosed = true;
     setCookie(
       popout_count_cookie_name,
       (props.popoutMessageConfig?.maxPopouts || 0).toString(),
       1 / 48
     );
-    setCookie(popout_closed_cookie_name, "true", 1 / 48);
+    setPopoutClosed(true);
+  };
+
+  // Function to start popout timer
+  const startPopoutTimer = () => {
+    if (!props.popoutMessageConfig) return;
+    if (!(isMobile ? props.popoutMessageConfig.show?.mobile : props.popoutMessageConfig.show?.desktop)) return;``
+    if (popoutClosed()) return;
+    if (popoutShown()) return;
+
+    if (
+      !props.popoutMessageConfig.maxPopouts ||
+      popoutOpenCount < props.popoutMessageConfig.maxPopouts
+    ) {
+      setTimeout(() => {
+        if (popoutClosed()) return;
+        if (!props.isBotOpened && !popoutShown() && props.canShowPopout) {
+          openPopout();
+        }
+      }, (props.popoutMessageConfig.delay ?? 2) * 1000);
+    } else {
+      // prettier-ignore
+      console.log("%c[REALTY-AI-BOT]", "color: #3B81F6; font-weight: bold;", "MAX POPOUTS REACHED");
+    }
   };
 
   onMount(() => {
-    if (
-      (isMobileCheck() && props.popoutMessageConfig?.show?.mobile) ||
-      (!isMobileCheck() && props.popoutMessageConfig?.show?.desktop)
-    ) {
-      if (props.isBotOpened) {
-        setPopoutMessageVisible(false);
-      } else if (!popoutClosed) {
-        if (
-          !props.popoutMessageConfig.maxPopouts ||
-          popoutOpenCount < props.popoutMessageConfig.maxPopouts
-        ) {
-          setTimeout(() => {
-            if (!props.isBotOpened && !popoutMessageVisible()) {
-              openPopout();
-            }
-          }, (props.popoutMessageConfig.delay ?? 2) * 1000);
-        } else {
-          // prettier-ignore
-          console.log("%c[REALTY-AI-BOT]", "color: #3B81F6; font-weight: bold;", "MAX POPOUTS REACHED");
-        }
-      }
+    // Only start popout timer if we're allowed to show popouts
+    if (props.canShowPopout) {
+      startPopoutTimer();
+    }
+
+    if (props.popoutMessageTheme.message) {
+      setPopoutMessage(props.popoutMessageTheme.message[Math.floor(Math.random() * props.popoutMessageTheme.message.length)]);
+    }
+  });
+
+  // Watch for changes in canShowPopout and trigger popout timer when it becomes true
+  createEffect(() => {
+    if (props.canShowPopout && !popoutShown()) {
+      startPopoutTimer();
     }
   });
 
   return (
     <div class="relative">
-      <Show when={!props.isBotOpened && popoutMessageVisible()}>
+      <Show when={!props.isBotOpened && popoutShown() && !popoutClosed()}>
         <div
           class="fixed items-end"
           style={{
@@ -123,13 +147,7 @@ export const BubbleButton = (props: Props) => {
                 "box-shadow": "0px 0px 10px 0px rgba(0, 0, 0, 0.1)",
               }}
             >
-              {props.popoutMessageTheme.message
-                ? props.popoutMessageTheme.message[
-                    Math.floor(
-                      Math.random() * props.popoutMessageTheme.message.length
-                    )
-                  ]
-                : ""}
+              {popoutMessage()}
               <button
                 onClick={closePopout}
                 class={`absolute top-[-6px] right-[-6px] h-5 w-5 flex justify-center items-center cursor-pointer hover:scale-125 active:scale-90 transition-transform duration-100`}
@@ -156,13 +174,11 @@ export const BubbleButton = (props: Props) => {
         onClick={() => {
           if (!isMobileCheck()) {
             props.toggleBot();
-            setPopoutMessageVisible(false);
           }
         }}
         onTouchStart={() => {
           if (isMobileCheck()) {
             props.toggleBot();
-            setPopoutMessageVisible(false);
           }
         }}
         class={
