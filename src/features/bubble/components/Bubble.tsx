@@ -40,6 +40,8 @@ export const Bubble = (props: BubbleProps) => {
   const [isVisible, setIsVisible] = createSignal(true);
   const [visibleCount, setVisibleCount] = createSignal(0);
   const [hasClosed, setHasClosed] = createSignal(false);
+  const [hasAutoOpened, setHasAutoOpened] = createSignal(defaultOpen);
+  const [canShowPopout, setCanShowPopout] = createSignal(false);
   const [isChatFlowAvailableToStream, setIsChatFlowAvailableToStream] =
     createSignal(false);
 
@@ -53,6 +55,7 @@ export const Bubble = (props: BubbleProps) => {
     openCount += 1;
     setCookie(count_cookie_name, openCount.toString(), 1 / 48);
     setIsBotOpened(true);
+    setHasAutoOpened(true);
   };
 
   const timedOpenBot = () => {
@@ -76,14 +79,33 @@ export const Bubble = (props: BubbleProps) => {
     }
   };
 
+  // Function to check if popout messages should be enabled
+  const checkIfCanShowPopout = () => {
+    const maxPopups = props.maxPopups ? props.maxPopups : 0;
+    const willAutoOpen = (isMobile ? props.defaultOpenMobile : props.defaultOpenDesktop) || props.delayOpenFlag;
+    
+    if ((!willAutoOpen) || (maxPopups > 0 && maxPopups <= openCount)) {
+      setCanShowPopout(true);
+      return;
+    }
+    setCanShowPopout(false);
+  };
+
+  // Initialize auto-opening logic
   if (props.delayOpenFlag) {
     setTimeout(timedOpenBot, props.delayOpenSeconds * 1000); //convert to mills
+  }
+  
+  // Check initially if we should enable popouts (for cases where window doesn't auto-open)
+  if (!defaultOpen) {
+    checkIfCanShowPopout();
   }
 
   const closeBot = () => {
     setIsBotOpened(false);
     setHasClosed(true);
     setCookie(cookie_name, "true", 1);
+    setCanShowPopout(true);
   };
 
   const toggleBot = () => {
@@ -130,6 +152,7 @@ export const Bubble = (props: BubbleProps) => {
         userID={props.userID}
         toggleBot={toggleBot}
         isBotOpened={isBotOpened()}
+        canShowPopout={canShowPopout()}
         popoutMessageConfig={popoutConfigProps.popoutMessageConfig}
         popoutMessageTheme={{
           message:

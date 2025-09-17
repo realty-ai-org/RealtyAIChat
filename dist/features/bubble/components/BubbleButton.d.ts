@@ -2,6 +2,7 @@ import { ButtonTheme, PopoutMessageConfig, PopoutMessageTheme } from "../types";
 type Props = ButtonTheme & {
     userID: string;
     isBotOpened: boolean;
+    canShowPopout: boolean;
     popoutMessageConfig: PopoutMessageConfig | undefined;
     popoutMessageTheme: PopoutMessageTheme;
     avatarSrc?: string;
