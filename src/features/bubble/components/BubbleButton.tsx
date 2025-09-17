@@ -58,7 +58,6 @@ export const BubbleButton = (props: Props) => {
   };
 
   const closePopout = () => {
-    popoutOpenCount = props.popoutMessageConfig?.maxPopouts || 0;
     setPopoutClosed(true);
   };
 
@@ -69,9 +68,11 @@ export const BubbleButton = (props: Props) => {
     if (popoutClosed()) return;
     if (popoutShown()) return;
 
+    const maxPopouts = isMobile && props.popoutMessageConfig.maxPopouts ? Math.min(props.popoutMessageConfig.maxPopouts, 2) : props.popoutMessageConfig.maxPopouts;
+
     if (
-      !props.popoutMessageConfig.maxPopouts ||
-      popoutOpenCount < props.popoutMessageConfig.maxPopouts
+      !maxPopouts ||
+      popoutOpenCount < maxPopouts
     ) {
       setTimeout(() => {
         if (popoutClosed()) return;
