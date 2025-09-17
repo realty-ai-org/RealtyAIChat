@@ -59,11 +59,6 @@ export const BubbleButton = (props: Props) => {
 
   const closePopout = () => {
     popoutOpenCount = props.popoutMessageConfig?.maxPopouts || 0;
-    setCookie(
-      popout_count_cookie_name,
-      (props.popoutMessageConfig?.maxPopouts || 0).toString(),
-      1 / 48
-    );
     setPopoutClosed(true);
   };
 
