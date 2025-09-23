@@ -23,9 +23,7 @@ export const Bubble = (props: BubbleProps) => {
     ? "calc(min(350px, max(100% - 100px,275px)))"
     : "calc(min(500px, max(100% - 100px,300px)))";
 
-  let defaultOpen = isMobile
-    ? props.defaultOpenMobile
-    : props.defaultOpenDesktop;
+  let defaultOpen = false;
   // grab cookie to check if bot has been closed before
   const cookie_name = `realty-ai-bot-closed-${props.userID}`;
   const count_cookie_name = `realty-ai-bot-open-count-${props.userID}`;
@@ -64,6 +62,10 @@ export const Bubble = (props: BubbleProps) => {
       return;
     }
 
+    if (isMobile && !props.defaultOpenMobile) {
+      return;
+    }
+
     const maxPopups = props.maxPopups ? props.maxPopups : 0;
     if (maxPopups <= openCount && maxPopups > 0) {
       // console.log("Max Popups", maxPopups);
@@ -82,7 +84,7 @@ export const Bubble = (props: BubbleProps) => {
   // Function to check if popout messages should be enabled
   const checkIfCanShowPopout = () => {
     const maxPopups = props.maxPopups ? props.maxPopups : 0;
-    const willAutoOpen = (isMobile ? props.defaultOpenMobile : props.defaultOpenDesktop) || props.delayOpenFlag;
+    const willAutoOpen = (!isMobile || props.defaultOpenMobile) && props.delayOpenFlag;
     
     if ((!willAutoOpen) || (maxPopups > 0 && maxPopups <= openCount)) {
       setCanShowPopout(true);
